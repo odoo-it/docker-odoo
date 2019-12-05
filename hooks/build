@@ -12,11 +12,11 @@ for target in base odoo odoo-e; do
         --file "$DOCKER_TAG.Dockerfile" \
         --build-arg VCS_REF="$GIT_SHA1" \
         --build-arg BUILD_DATE="$(date --rfc-3339 ns)" \
-        --tag "$DOCKER_REPO:$DOCKER_TAG-$target" \
+        --tag "$DOCKER_REPO:$DOCKER_TAG.$target" \
         --target $target \
         .
 
     if [ "$target" == "odoo" ]; then
-        docker image tag "$DOCKER_REPO:$DOCKER_TAG-$target" "$DOCKER_REPO:$DOCKER_TAG"
+        docker image tag "$DOCKER_REPO:$DOCKER_TAG.$target" "$DOCKER_REPO:$DOCKER_TAG"
     fi
 done
