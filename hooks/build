@@ -1,0 +1,15 @@
+#!/bin/bash
+set -ex
+
+for target in base odoo odoo-e; do
+    docker image build \
+        --file "$DOCKER_TAG.Dockerfile" \
+        --build-arg VCS_REF="$GIT_SHA1" \
+        --build-arg BUILD_DATE="$(date --rfc-3339 ns)" \
+        --tag "$DOCKER_REPO:$DOCKER_TAG-$target" \
+        .
+
+    if [ "$target" == "odoo" ]; then
+        docker image tag "$DOCKER_REPO:$DOCKER_TAG"
+    fi
+done

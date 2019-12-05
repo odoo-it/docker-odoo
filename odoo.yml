@@ -1,0 +1,9 @@
+
+odoo:
+    defaults:
+        depth: 1
+    remotes:
+        odoo: https://github.com/odoo/odoo.git
+    merges:
+        - odoo $ODOO_VERSION
+    target: odoo $ODOO_VERSION

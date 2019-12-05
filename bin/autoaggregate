@@ -1,0 +1,86 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+
+import os
+import sys
+import yaml
+from glob import glob
+from multiprocessing import cpu_count
+from subprocess import check_call
+from argparse import ArgumentParser
+
+import logging
+logger = logging.getLogger(__name__)
+
+
+# Define CLI options
+parser = ArgumentParser(
+    description="Runs git-aggregate and install requirements")
+
+parser.add_argument(
+    "-c", "--config", type=str, default="repos.yml", help="repos.yml file"
+)
+
+parser.add_argument(
+    "-i",
+    "--install",
+    action="store_true",
+    help="Install requirements.txt, if present.",
+)
+
+parser.add_argument(
+    "-d",
+    "--dependencies",
+    action="store_true",
+    help="Install oca_dependencies.txt, if present.",
+)
+
+parser.add_argument(
+    "-o",
+    "--output",
+    type=str,
+    default=os.getcwd(),
+)
+
+args = parser.parse_args()
+
+if args.dependencies:
+    raise Exception('Not implemented. TODO: Install oca_dependencies.txt')
+
+
+def gitaggregate(config):
+    logger.info("Running gitaggregate with %s" % config)
+    check_call(
+        [
+            "gitaggregate",
+            "--expand-env",
+            "--config",
+            os.path.abspath(config),
+            "--jobs",
+            str(cpu_count() or 1),
+            # "--log-level",
+            # "DEBUG",
+        ],
+        cwd=args.output,
+        stderr=sys.stderr,
+        stdout=sys.stdout,
+    )
+
+
+# Initial gitaggregate
+gitaggregate(args.config)
+
+# Loop through installed repos and install requirements
+if args.install:
+    req_files = set()
+    with open(args.config) as yaml_file:
+        for doc in yaml.safe_load_all(yaml_file):
+            for repo in doc:
+                repo_path = os.path.abspath(os.path.join(args.output, repo))
+                req_file = os.path.join(repo_path, 'requirements.txt')
+                if os.path.isfile(req_file):
+                    req_files.add(req_file)
+
+    for req_file in req_files:
+        logger.info('Intalling %s' % req_file)
+        os.system("pip3 install --user --no-cache-dir -r %s" % req_file)

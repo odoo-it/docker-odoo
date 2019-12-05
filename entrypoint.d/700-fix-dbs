@@ -1,0 +1,15 @@
+#!/bin/bash
+set -e
+
+# Add the unaccent module for the database if needed
+# Fail silently, because database may not exist
+if [ "${UNACCENT,,}" == "true" ] && [ "${DATABASE,,}" != "" ]; then
+    echo Trying to install unaccent extension > /dev/stderr
+    ! psql -d "$DATABASE" -c 'CREATE EXTENSION IF NOT EXISTS unaccent;'
+fi
+
+# Update modules
+if [ "${FIXDBS,,}" == "true" ] && [ "${DATABASE,,}" != "" ]; then
+    echo Trying to fix databases > /dev/stderr
+    click-odoo-update --if-exists
+fi

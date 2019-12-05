@@ -1,0 +1,9 @@
+
+enterprise:
+    defaults: 
+        depth: 1
+    remotes:
+        odoo: https://$GITHUB_USER:$GITHUB_TOKEN@github.com/odoo/enterprise.git
+    merges:
+        - odoo $ODOO_VERSION
+    target: odoo $ODOO_VERSION
