@@ -17,6 +17,6 @@ for target in base odoo odoo-e; do
         .
 
     if [ "$target" == "odoo" ]; then
-        docker image tag "$DOCKER_REPO:$DOCKER_TAG"
+        docker image tag "$DOCKER_REPO:$DOCKER_TAG-$target" "$DOCKER_REPO:$DOCKER_TAG"
     fi
 done

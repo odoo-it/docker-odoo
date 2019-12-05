@@ -77,14 +77,13 @@ RUN gem install --no-rdoc --no-ri --no-update-sources bootstrap-sass --version '
 ARG ODOO_SOURCE=odoo/odoo
 ARG ODOO_VERSION=9.0
 ENV ODOO_VERSION="$ODOO_VERSION"
-RUN debs="libldap2-dev libsasl2-dev" \
+RUN debs="python-dev build-essential libxml2-dev libxslt1-dev libjpeg-dev libfreetype6-dev liblcms2-dev libopenjpeg-dev libtiff5-dev tk-dev tcl-dev linux-headers-amd64 libpq-dev libldap2-dev libsasl2-dev" \
     && apt-get update \
     && apt-get install -yqq --no-install-recommends $debs \
     && pip install \
         -r https://raw.githubusercontent.com/$ODOO_SOURCE/$ODOO_VERSION/requirements.txt \
         phonenumbers \
-        'websocket-client~=0.53' \
-    && (python3 -m compileall -q /usr/local/lib/python3.5/ || true) \
+        watchdog \
     && apt-get purge -yqq $debs \
     && rm -Rf /var/lib/apt/lists/* /tmp/*
 
