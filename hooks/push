@@ -2,6 +2,9 @@
 set -ex
 
 for target in base odoo odoo-e; do
+    if [ "$target" == "odoo-e" ] && [ -z "$GITHUB_USER" ]; then
+        continue
+    fi
     docker push "$DOCKER_REPO:$DOCKER_TAG.$target"
 done
 

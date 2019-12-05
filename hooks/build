@@ -2,6 +2,12 @@
 set -ex
 
 for target in base odoo odoo-e; do
+
+    if [ "$target" == "odoo-e" ] && [ -z "$GITHUB_USER" ]; then
+        echo "Can't build odoo-e without GITHUB_USER and GITHUB_TOKEN"
+        continue
+    fi
+
     docker image build \
         --file "$DOCKER_TAG.Dockerfile" \
         --build-arg VCS_REF="$GIT_SHA1" \
