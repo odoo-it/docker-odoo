@@ -13,7 +13,7 @@ for target in base odoo odoo-e; do
         --build-arg VCS_REF="$GIT_SHA1" \
         --build-arg BUILD_DATE="$(date --rfc-3339 ns)" \
         --tag "$DOCKER_REPO:$DOCKER_TAG-$target" \
-        --target $target
+        --target $target \
         .
 
     if [ "$target" == "odoo" ]; then
