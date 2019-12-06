@@ -18,6 +18,9 @@ ENV GIT_AUTHOR_NAME=docker-odoo \
 
 # Default values of env variables used by scripts
 ENV ODOO_SERVER=odoo \
+    UNACCENT=True \
+    PROXY_MODE=True \
+    WITHOUT_DEMO=True \
     WAIT_PG=true \
     PGUSER=odoo \
     PGPASSWORD=odoo \
