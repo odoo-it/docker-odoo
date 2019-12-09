@@ -150,7 +150,7 @@ RUN pip install --user --no-cache-dir $SOURCES/odoo
 #   Odoo Enterprise
 #
 
-FROM odoo AS odoo-e
+FROM odoo AS enterprise
 ARG GITHUB_USER
 ARG GITHUB_TOKEN
 ENV GITHUB_USER="$GITHUB_USER"

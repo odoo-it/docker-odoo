@@ -1,11 +1,19 @@
 #!/bin/bash
 set -ex
 
-for target in base odoo odoo-e; do
-    if [ "$target" == "odoo-e" ] && [ -z "$GITHUB_USER" ]; then
+for target in base odoo enterprise; do
+
+    # Don't build enterprise if GITHUB_USER or GITHUB_TOKEN are missing.
+    if [ "$target" == "enterprise" ] && [[ -z "$GITHUB_USER" || -z "$GITHUB_TOKEN" ]]; then
+        echo "Can't build enterprise without GITHUB_USER and GITHUB_TOKEN"
         continue
     fi
-    docker push "$DOCKER_REPO:$DOCKER_TAG.$target"
-done
 
-docker push "$DOCKER_REPO:$DOCKER_TAG"
+    # Don't add a special tag for community.
+    TAG="$DOCKER_REPO:$DOCKER_TAG-$target"
+    if [ "$target" == "odoo" ]; then
+        TAG="$DOCKER_REPO:$DOCKER_TAG"
+    fi
+
+    docker push "$TAG"
+done
