@@ -3,6 +3,11 @@ set -ex
 
 for target in base odoo enterprise; do
 
+    # Don't build base if BUILD_TAG_BASE != true
+    if [ "$target" == "base" ] && [ -z "$BUILD_TAG_BASE" ]; then
+        continue
+    fi
+
     # Don't build enterprise if GITHUB_USER or GITHUB_TOKEN are missing.
     if [ "$target" == "enterprise" ] && [[ -z "$GITHUB_USER" || -z "$GITHUB_TOKEN" ]]; then
         echo "Can't build enterprise without GITHUB_USER and GITHUB_TOKEN"
