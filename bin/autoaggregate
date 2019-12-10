@@ -83,4 +83,4 @@ if args.install:
 
     for req_file in req_files:
         logger.info('Intalling %s' % req_file)
-        os.system("pip3 install --user --no-cache-dir -r %s" % req_file)
+        os.system("pip install --user --no-cache-dir -r %s" % req_file)
