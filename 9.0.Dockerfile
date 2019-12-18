@@ -112,7 +112,7 @@ ENV SOURCES /home/odoo/src
 ENV CUSTOM /home/odoo/custom
 ENV RESOURCES /home/odoo/.resources
 ENV CONFIG_DIR /home/odoo/.config
-ENV DATA_DIR /home/odoo/.local
+ENV DATA_DIR /home/odoo/data
 
 ENV OPENERP_SERVER=$CONFIG_DIR/odoo.conf
 ENV ODOO_RC=$OPENERP_SERVER
