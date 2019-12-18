@@ -22,9 +22,9 @@ files = [(d, dir_exec) for d in os.listdir(dir_exec)]
 
 # Run scripts
 for executable, folder in sorted(files):
-    if executable == 'empty':
-        continue
     command = os.path.join(folder, executable)
+    if not os.path.getsize(command):
+        continue
     if os.access(command, os.X_OK):
         logger.info("Executing %s", command)
         subprocess.check_call(command)
