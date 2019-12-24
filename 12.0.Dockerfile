@@ -60,6 +60,11 @@ RUN apt-get -qq update \
     && wkhtmltopdf --version \
     && rm -Rf /var/lib/apt/lists/* /tmp/*
 
+# Special case to get latest Less
+RUN ln -s /usr/bin/nodejs /usr/local/bin/node \
+    && npm install -g less \
+    && rm -Rf ~/.npm /tmp/*
+
 # Execute installation script by Odoo version
 # This is at the end to benefit from cache at build time
 # https://docs.docker.com/engine/reference/builder/#/impact-on-build-caching
