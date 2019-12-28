@@ -45,6 +45,7 @@ RUN sed -Ei 's@(^deb http://deb.debian.org/debian jessie-updates main$)@#\1@' /e
         locales-all zlibc \
         bzip2 ca-certificates curl gettext-base git nano \
         openssh-client telnet xz-utils \
+        sudo \
     && curl https://bootstrap.pypa.io/get-pip.py | python /dev/stdin \
     && curl -sL https://deb.nodesource.com/setup_6.x | bash - \
     && apt-get install -yqq nodejs \
