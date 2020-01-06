@@ -49,6 +49,7 @@ RUN apt-get -qq update \
         locales-all \
         nano \
         npm \
+        wget \
         openssh-client \
         telnet \
         vim \
