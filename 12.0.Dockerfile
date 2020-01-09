@@ -11,6 +11,7 @@ RUN useradd -md /home/odoo -s /bin/false odoo \
 # System environment variables
 ENV GIT_AUTHOR_NAME=docker-odoo \
     GIT_COMMITTER_NAME=docker-odoo \
+    EMAIL=docker-odoo@example.com \
     LC_ALL=C.UTF-8 \
     NODE_PATH=/usr/local/lib/node_modules:/usr/lib/node_modules \
     PATH="/home/odoo/.local/bin:$PATH" \
