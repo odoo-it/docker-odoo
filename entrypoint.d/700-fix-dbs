@@ -11,5 +11,5 @@ fi
 # Update modules
 if [ "${FIXDBS,,}" == "true" ] && [ "${DATABASE,,}" != "" ]; then
     echo Trying to fix databases > /dev/stderr
-    click-odoo-update --if-exists
+    click-odoo-update --if-exists --watcher-max-seconds ${CLICK_ODOO_UPDATE_WATCHER_MAX_SECONDS-30}
 fi
