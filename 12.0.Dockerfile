@@ -123,6 +123,9 @@ RUN mkdir -p $SOURCES/repositories && \
     chown -R odoo.odoo /home/odoo && \
     sync
 
+# Usefull aliases
+RUN echo "alias odoo-shell='odoo shell --shell-interface ipython --no-http --limit-memory-hard=0 --limit-memory-soft=0'" >> /home/odoo/.bashrc
+
 # Image building scripts
 COPY bin/* /usr/local/bin/
 COPY build.d $RESOURCES/build.d
