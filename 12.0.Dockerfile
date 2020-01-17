@@ -89,6 +89,9 @@ RUN debs="libldap2-dev libsasl2-dev" \
 RUN pip install --no-cache-dir \
     phonenumbers \
     git-aggregator \
+    ipython \
+    pysnooper \
+    git+git://github.com/OCA/openupgradelib.git \
     click-odoo-contrib
 
 # Metadata
