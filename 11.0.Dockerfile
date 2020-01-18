@@ -93,6 +93,9 @@ RUN debs="libldap2-dev libsasl2-dev" \
 RUN pip install --no-cache-dir \
     phonenumbers \
     git-aggregator \
+    ipython \
+    pysnooper \
+    git+git://github.com/OCA/openupgradelib.git \
     click-odoo-contrib
 
 # Metadata
@@ -123,6 +126,9 @@ RUN mkdir -p $SOURCES/repositories && \
     mkdir -p $RESOURCES && \
     chown -R odoo.odoo /home/odoo && \
     sync
+
+# Usefull aliases
+RUN echo "alias odoo-shell='odoo shell --shell-interface ipython --no-xmlrpc'" >> /home/odoo/.bashrc
 
 # Image building scripts
 COPY bin/* /usr/local/bin/

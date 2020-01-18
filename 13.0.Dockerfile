@@ -93,6 +93,9 @@ RUN build_deps=" \
     && pip install --no-cache-dir \
         -r https://raw.githubusercontent.com/$ODOO_SOURCE/$ODOO_VERSION/requirements.txt \
         git-aggregator \
+        ipython \
+        pysnooper \
+        git+git://github.com/OCA/openupgradelib.git \
         click-odoo-contrib \
         pg_activity \
         phonenumbers \
@@ -129,6 +132,9 @@ RUN mkdir -p $SOURCES/repositories && \
     mkdir -p $RESOURCES && \
     chown -R odoo.odoo /home/odoo && \
     sync
+
+# Usefull aliases
+RUN echo "alias odoo-shell='odoo shell --shell-interface ipython --no-http --limit-memory-hard=0 --limit-memory-soft=0'" >> /home/odoo/.bashrc
 
 # Image building scripts
 COPY bin/* /usr/local/bin/
