@@ -91,6 +91,7 @@ RUN pip install --no-cache-dir \
     git-aggregator \
     ipython \
     pysnooper \
+    ipdb \
     git+git://github.com/OCA/openupgradelib.git \
     click-odoo-contrib
 
