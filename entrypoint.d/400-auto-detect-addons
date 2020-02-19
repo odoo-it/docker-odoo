@@ -6,6 +6,11 @@ echo Patching configuration > /dev/stderr
 ODOO_DIR=$SOURCES/odoo
 ODOO_ADDONS=$ODOO_DIR/addons/,$ODOO_DIR/odoo/addons/
 
+# Compatibility with Odoo <= 9
+if [[ " 6.0 7.0 8.0 9.0 " =~ .*\ $ODOO_VERSION\ .* ]]; then
+	ODOO_ADDONS=$ODOO_DIR/addons/,$ODOO_DIR/openerp/addons/
+fi
+
 # Add enterprise, if available
 if [ -d "$SOURCES/enterprise" ]; then
 	ODOO_ADDONS=$SOURCES/enterprise/,$ODOO_ADDONS
