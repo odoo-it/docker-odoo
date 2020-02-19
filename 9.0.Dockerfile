@@ -163,6 +163,9 @@ COPY odoo.yml $RESOURCES/
 RUN autoaggregate --config "$RESOURCES/odoo.yml" --install --output $SOURCES
 RUN pip install --user --no-cache-dir $SOURCES/odoo
 
+# Simulate odoo bin
+RUN cp /home/odoo/.local/bin/openerp-server /home/odoo/.local/bin/odoo
+
 #
 #   Odoo Enterprise
 #
