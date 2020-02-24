@@ -20,6 +20,10 @@ if os.environ.get('ODOO_VERSION') in ['6.0', '7.0', '8.0', '9.0']:
 else:
     addons.append(os.path.join(SOURCES, 'odoo', 'odoo', 'addons'))
 
+# Handle enterprise
+if os.path.isdir(os.path.join(SOURCES, 'enterprise')):
+    addons.insert(0, os.path.join(SOURCES, 'enterprise'))
+
 # Add repositories
 addons += [
     os.path.join(REPOSITORIES, d)
