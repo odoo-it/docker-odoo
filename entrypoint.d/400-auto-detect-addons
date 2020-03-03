@@ -26,20 +26,26 @@ else:
 if os.path.isdir(os.path.join(SOURCES, 'enterprise')):
     addons.insert(0, os.path.join(SOURCES, 'enterprise'))
 
+# Project repositories
+repo_addons = []
+
 # Custom repositories, usually mounted for development
 if os.path.isdir(CUSTOM_REPOSITORIES):
-    addons += [
+    repo_addons += [
         os.path.join(CUSTOM_REPOSITORIES, d)
         for d in sorted(os.listdir(CUSTOM_REPOSITORIES))
         if os.path.isdir(os.path.join(CUSTOM_REPOSITORIES, d))
     ]
 
 # Add repositories
-addons += [
+repo_addons += [
     os.path.join(REPOSITORIES, d)
     for d in sorted(os.listdir(REPOSITORIES))
     if os.path.isdir(os.path.join(REPOSITORIES, d))
 ]
+
+# Repo addons are preprended, in case we want to overwrite odoo modules
+addons = repo_addons + addons
 
 # Overwrite 10-addons.conf
 _logger.debug('Updating addons_path.. %s' % addons)
