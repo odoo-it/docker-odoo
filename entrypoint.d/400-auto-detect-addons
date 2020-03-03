@@ -6,9 +6,11 @@ import logging
 _logger = logging.getLogger(__name__)
 
 
+RESOURCES = os.environ.get('RESOURCES')
 SOURCES = os.environ.get('SOURCES')
 REPOSITORIES = os.path.join(SOURCES, 'repositories')
-RESOURCES = os.environ.get('RESOURCES')
+CUSTOM = os.environ.get('CUSTOM')
+CUSTOM_REPOSITORIES = os.path.join(CUSTOM, 'repositories')
 
 addons = [
     os.path.join(SOURCES, 'odoo', 'addons'),
@@ -23,6 +25,14 @@ else:
 # Handle enterprise
 if os.path.isdir(os.path.join(SOURCES, 'enterprise')):
     addons.insert(0, os.path.join(SOURCES, 'enterprise'))
+
+# Custom repositories, usually mounted for development
+if os.path.isdir(CUSTOM_REPOSITORIES):
+    addons += [
+        os.path.join(CUSTOM_REPOSITORIES, d)
+        for d in sorted(os.listdir(CUSTOM_REPOSITORIES))
+        if os.path.isdir(os.path.join(CUSTOM_REPOSITORIES, d))
+    ]
 
 # Add repositories
 addons += [
