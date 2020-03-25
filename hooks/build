@@ -8,6 +8,12 @@ for target in base odoo enterprise; do
         continue
     fi
 
+    # Don't build enterprise if version is <= 8.0
+    if [ "$target" == "enterprise" ] && [[ "$DOCKER_TAG" == "7.0" || "DOCKER_TAG" == "8.0" ]]; then
+        echo "Skipping enterprise on $DOCKER_TAG"
+        continue
+    fi
+
     # Don't build enterprise if GITHUB_USER or GITHUB_TOKEN are missing.
     if [ "$target" == "enterprise" ] && [[ -z "$GITHUB_USER" || -z "$GITHUB_TOKEN" ]]; then
         echo "Can't build enterprise without GITHUB_USER and GITHUB_TOKEN"
@@ -24,6 +30,7 @@ for target in base odoo enterprise; do
         --file "$DOCKER_TAG.Dockerfile" \
         --build-arg VCS_REF="$GIT_SHA1" \
         --build-arg BUILD_DATE="$(date --rfc-3339 ns)" \
+        --build-arg ODOO_VERSION="$DOCKER_TAG" \
         --build-arg GITHUB_USER="$GITHUB_USER" \
         --build-arg GITHUB_TOKEN="$GITHUB_TOKEN" \
         --tag "$TAG" \
