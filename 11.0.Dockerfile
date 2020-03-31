@@ -76,6 +76,7 @@ RUN gem install --no-rdoc --no-ri --no-update-sources bootstrap-sass --version '
 # This is at the end to benefit from cache at build time
 # https://docs.docker.com/engine/reference/builder/#/impact-on-build-caching
 ARG ODOO_SOURCE=odoo/odoo
+ENV ODOO_SOURCE="$ODOO_SOURCE"
 ARG ODOO_VERSION=11.0
 ENV ODOO_VERSION="$ODOO_VERSION"
 RUN debs="libldap2-dev libsasl2-dev" \

@@ -66,6 +66,7 @@ RUN apt-get -qq update \
     && sync
 
 ARG ODOO_SOURCE=odoo/odoo
+ENV ODOO_SOURCE="$ODOO_SOURCE"
 ARG ODOO_VERSION=13.0
 ENV ODOO_VERSION="$ODOO_VERSION"
 
