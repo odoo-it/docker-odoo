@@ -66,6 +66,7 @@ RUN apt-get -qq update \
     && sync
 
 ARG ODOO_SOURCE=odoo/odoo
+ENV ODOO_SOURCE="$ODOO_SOURCE"
 ARG ODOO_VERSION=13.0
 ENV ODOO_VERSION="$ODOO_VERSION"
 
@@ -167,8 +168,7 @@ RUN pip install --user Werkzeug==0.14.1
 #
 
 FROM base AS odoo
-COPY odoo.yml $RESOURCES/
-RUN autoaggregate --config "$RESOURCES/odoo.yml" --install --output $SOURCES
+RUN git clone --single-branch --depth 1 --branch $ODOO_VERSION https://github.com/$ODOO_SOURCE $SOURCES/odoo
 RUN pip install --user --no-cache-dir $SOURCES/odoo
 
 #
@@ -180,5 +180,4 @@ ARG GITHUB_USER
 ARG GITHUB_TOKEN
 ENV GITHUB_USER="$GITHUB_USER"
 ENV GITHUB_TOKEN="$GITHUB_TOKEN"
-COPY odoo-e.yml $RESOURCES/
-RUN autoaggregate --config "$RESOURCES/odoo-e.yml" --install --output $SOURCES
+RUN git clone --single-branch --depth 1 --branch $ODOO_VERSION https://$GITHUB_USER:$GITHUB_TOKEN@github.com/odoo/enterprise.git $SOURCES/enterprise
