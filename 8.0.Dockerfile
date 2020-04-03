@@ -28,8 +28,7 @@ ENV ODOO_SERVER=odoo \
     PGPASSWORD=odoo \
     PGHOST=db \
     PGPORT=5432 \
-    ADMIN_PASSWORD=admin \
-    DB_TEMPLATE=template1
+    ADMIN_PASSWORD=admin
 
 # Other requirements and recommendations to run Odoo
 # See https://github.com/$ODOO_SOURCE/blob/$ODOO_VERSION/debian/control
