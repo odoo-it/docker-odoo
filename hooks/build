@@ -30,8 +30,9 @@ for target in base odoo enterprise; do
         --file "$DOCKER_TAG.Dockerfile" \
         --build-arg VCS_REF="$GIT_SHA1" \
         --build-arg BUILD_DATE="$(date --rfc-3339 ns)" \
-        --build-arg ODOO_SOURCE="${ODOO_SOURCE-odoo/odoo}" \
         --build-arg ODOO_VERSION="$DOCKER_TAG" \
+        --build-arg ODOO_SOURCE="${ODOO_SOURCE-odoo/odoo}" \
+        --build-arg ODOO_SOURCE_DEPTH="${ODOO_SOURCE_DEPTH-1}" \
         --build-arg GITHUB_USER="$GITHUB_USER" \
         --build-arg GITHUB_TOKEN="$GITHUB_TOKEN" \
         --tag "$TAG" \

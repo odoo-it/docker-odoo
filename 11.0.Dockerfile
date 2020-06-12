@@ -74,10 +74,13 @@ RUN gem install --no-rdoc --no-ri --no-update-sources bootstrap-sass --version '
 # Execute installation script by Odoo version
 # This is at the end to benefit from cache at build time
 # https://docs.docker.com/engine/reference/builder/#/impact-on-build-caching
-ARG ODOO_SOURCE=odoo/odoo
-ENV ODOO_SOURCE="$ODOO_SOURCE"
 ARG ODOO_VERSION=11.0
+ARG ODOO_SOURCE=odoo/odoo
+ARG ODOO_SOURCE_DEPTH=1
 ENV ODOO_VERSION="$ODOO_VERSION"
+ENV ODOO_SOURCE="$ODOO_SOURCE"
+ENV ODOO_SOURCE_DEPTH="$ODOO_SOURCE_DEPTH"
+
 RUN debs="libldap2-dev libsasl2-dev" \
     && apt-get update \
     && apt-get install -yqq --no-install-recommends $debs \
@@ -161,7 +164,7 @@ RUN pip install --user Werkzeug==0.14.1
 #
 
 FROM base AS odoo
-RUN git clone --single-branch --depth 1 --branch $ODOO_VERSION https://github.com/$ODOO_SOURCE $SOURCES/odoo
+RUN git clone --single-branch --depth $ODOO_SOURCE_DEPTH --branch $ODOO_VERSION https://github.com/$ODOO_SOURCE $SOURCES/odoo
 RUN pip install --user --no-cache-dir $SOURCES/odoo
 
 #
@@ -173,4 +176,4 @@ ARG GITHUB_USER
 ARG GITHUB_TOKEN
 ENV GITHUB_USER="$GITHUB_USER"
 ENV GITHUB_TOKEN="$GITHUB_TOKEN"
-RUN git clone --single-branch --depth 1 --branch $ODOO_VERSION https://$GITHUB_USER:$GITHUB_TOKEN@github.com/odoo/enterprise.git $SOURCES/enterprise
+RUN git clone --single-branch --depth $ODOO_SOURCE_DEPTH --branch $ODOO_VERSION https://$GITHUB_USER:$GITHUB_TOKEN@github.com/odoo/enterprise.git $SOURCES/enterprise
