@@ -27,7 +27,7 @@ for target in base odoo enterprise; do
     fi
 
     docker image build \
-        --file "$DOCKER_TAG.Dockerfile" \
+        --file "$DOCKERFILE_PATH" \
         --build-arg VCS_REF="$GIT_SHA1" \
         --build-arg BUILD_DATE="$(date --rfc-3339 ns)" \
         --build-arg ODOO_VERSION="$DOCKER_TAG" \
