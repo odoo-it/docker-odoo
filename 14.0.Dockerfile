@@ -64,7 +64,7 @@ RUN apt-get -qq update \
     && rm -Rf wkhtmltox.deb /var/lib/apt/lists/* /tmp/* \
     && sync
 
-ARG ODOO_VERSION=13.0
+ARG ODOO_VERSION=14.0
 ARG ODOO_SOURCE=odoo/odoo
 ARG ODOO_SOURCE_DEPTH=1
 ENV ODOO_VERSION="$ODOO_VERSION"
@@ -100,6 +100,7 @@ RUN build_deps=" \
         ipdb \
         git+git://github.com/OCA/openupgradelib.git \
         click-odoo-contrib \
+        geoip2 \
         pg_activity \
         phonenumbers \
     && (python3 -m compileall -q /usr/local/lib/python3.7/ || true) \
