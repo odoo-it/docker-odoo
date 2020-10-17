@@ -1,42 +1,65 @@
 #!/bin/bash
 set -ex
 
-for target in base odoo enterprise; do
+# Default value in case it's not present
+if [ -z "$DOCKERFILE_PATH" ]; then
+    DOCKERFILE_PATH="$DOCKER_TAG.Dockerfile"
+fi
 
+# Build the odoo without odoo tags
+# These are the real deal
+for target in base onbuild; do
     # Don't build base if BUILD_TAG_BASE != true
-    if [ "$target" == "base" ] && [ -z "$BUILD_TAG_BASE" ]; then
-        continue
-    fi
-
-    # Don't build enterprise if version is <= 8.0
-    if [ "$target" == "enterprise" ] && [[ "$DOCKER_TAG" == "7.0" || "$DOCKER_TAG" == "8.0" ]]; then
-        echo "Skipping enterprise on $DOCKER_TAG"
-        continue
-    fi
-
-    # Don't build enterprise if GITHUB_USER or GITHUB_TOKEN are missing.
-    if [ "$target" == "enterprise" ] && [[ -z "$GITHUB_USER" || -z "$GITHUB_TOKEN" ]]; then
-        echo "Can't build enterprise without GITHUB_USER and GITHUB_TOKEN"
-        continue
-    fi
-
-    # Don't add a special tag for community.
+    if [[ "$target" == "base" ]] && [[ -z "$BUILD_TAG_BASE" ]]; then continue; fi
+    # Add a special onbuild tag
     TAG="$DOCKER_REPO:$DOCKER_TAG-$target"
-    if [ "$target" == "odoo" ]; then
-        TAG="$DOCKER_REPO:$DOCKER_TAG"
-    fi
-
+    # Build
     docker image build \
         --file "$DOCKERFILE_PATH" \
         --build-arg VCS_REF="$GIT_SHA1" \
         --build-arg BUILD_DATE="$(date --rfc-3339 ns)" \
         --build-arg ODOO_VERSION="$DOCKER_TAG" \
+        --target $target \
+        --tag $TAG \
+        .
+done
+
+# Build odoo included tags
+# These images are based on the onbuild tag
+# Added here for convenience.
+for target in odoo enterprise; do
+    # Don't build tags that we shouldn't build
+    if [[ "$target" == "odoo" ]] && [[ -z "$BUILD_TAG_ODOO" ]]; then continue; fi
+    if [[ "$target" == "enterprise" ]] && [[ -z "$BUILD_TAG_ENTERPRISE" ]]; then continue; fi
+    # Don't build enterprise if version is <= 8.0
+    if [[ "$target" == "enterprise" ]] && [[ "$DOCKER_TAG" == "7.0" || "$DOCKER_TAG" == "8.0" ]]; then
+        continue
+    fi
+    # Don't build enterprise if GITHUB_USER or GITHUB_TOKEN are missing.
+    if [[ "$target" == "enterprise" ]] && [[ -z "$GITHUB_USER" || -z "$GITHUB_TOKEN" ]]; then
+        echo "Can't build enterprise without GITHUB_USER and GITHUB_TOKEN"
+        continue
+    fi
+    # Odoo CE has no special tag
+    # Odoo EE has -enterprise tag
+    TAG="$DOCKER_REPO:$DOCKER_TAG"
+    if [[ "$target" == "enterprise" ]]; then TAG="$TAG-$target"; fi
+    if [[ "$target" == "enterprise" ]]; then INSTALL_ENTERPRISE="true"; fi
+    # Build
+    docker image build \
+        --file "Dockerfile" \
+        --build-arg VCS_REF="$GIT_SHA1" \
+        --build-arg BUILD_DATE="$(date --rfc-3339 ns)" \
+        --build-arg DOCKER_REPO="$DOCKER_REPO" \
+        --build-arg DOCKER_TAG="$DOCKER_TAG" \
+        --build-arg ODOO_VERSION="$DOCKER_TAG" \
         --build-arg ODOO_SOURCE="${ODOO_SOURCE-odoo/odoo}" \
         --build-arg ODOO_SOURCE_DEPTH="${ODOO_SOURCE_DEPTH-1}" \
         --build-arg GITHUB_USER="$GITHUB_USER" \
         --build-arg GITHUB_TOKEN="$GITHUB_TOKEN" \
-        --tag "$TAG" \
-        --target $target \
+        --build-arg INSTALL_ODOO="true" \
+        --build-arg INSTALL_ENTERPRISE=$INSTALL_ENTERPRISE \
+        --target odoo \
+        --tag $TAG \
         .
-
 done

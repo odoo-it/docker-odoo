@@ -1,6 +1,5 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-
 import os
 import sys
 import yaml
@@ -82,4 +81,4 @@ if args.install:
 
     for req_file in req_files:
         logger.info('Intalling %s' % req_file)
-        os.system("pip install --user --no-cache-dir -r %s" % req_file)
+        os.system("pip install --no-cache-dir -r %s" % req_file)

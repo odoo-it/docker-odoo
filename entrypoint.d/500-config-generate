@@ -1,6 +1,5 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-"""Generate Odoo server configuration from templates"""
 
 import os
 from contextlib import closing
@@ -24,9 +23,7 @@ except ImportError:
     parser = RawConfigParser()
 
 ODOO_VERSION = os.environ.get("ODOO_VERSION")
-TARGET_FILE = os.environ.get("OPENERP_SERVER")
-if ODOO_VERSION not in {"8.0", "9.0"}:
-    TARGET_FILE = os.environ.get("ODOO_RC", TARGET_FILE)
+TARGET_FILE = os.environ.get("ODOO_RC", os.environ.get("OPENERP_SERVER"))
 CONFIG_DIR = os.path.join(os.environ.get("RESOURCES"), "conf.d")
 CONFIG_FILES = []
 
@@ -43,13 +40,13 @@ with closing(StringIO()) as resultfp:
     # We'll skip lines with errores
     result = []
     for line in resultfp:
+        line = line.strip()
         try:
             # Try to expand variables
             line = Template(line).substitute(os.environ)
         except KeyError as e:
             # If error, simply ignore this line
-            _logger.warning('Missing env %s. Skipping config line: %s' % (
-                str(e), line))
+            _logger.warning('Skipping config line: %s (missing env)' % (line))
             continue
         result.append(line)
     # Merge config file

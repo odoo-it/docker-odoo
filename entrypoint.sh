@@ -1,17 +1,17 @@
 #!/bin/bash
 set -e
 
-echo "Running entrypoint.d..."
+echo "Preparing environment..."
 $RESOURCES/entrypoint
 
-echo "Running command... $@"
+echo "Running command: $@"
 case "$1" in
     --)
         shift
-        exec $ODOO_SERVER "$@"
+        exec odoo "$@"
         ;;
     -*)
-        exec $ODOO_SERVER "$@"
+        exec odoo "$@"
         ;;
     *)
         exec "$@"
