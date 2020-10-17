@@ -1,0 +1,63 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+import os
+import sys
+import subprocess
+
+PATH_REQUIREMENTS = "%s/requirements" % (os.environ.get("RESOURCES"))
+
+
+def read_requirements(filepath):
+    """Get a list of requirements from the given file."""
+    requirements = []
+    try:
+        with open(filepath, "r") as fh:
+            for line in fh:
+                line = line.strip()
+                if not line or line.startswith("#"):
+                    continue
+                requirements += line.split()
+    except IOError:
+        # No requirements file
+        pass
+    return requirements
+
+
+def install_apt(packages):
+    if packages:
+        subprocess.check_call(
+            ['apt', 'install', '-y', '--no-install-recommends'] + packages
+        )
+
+
+def install_pip(packages):
+    if packages:
+        subprocess.check_call([
+            'pip', 'install', '--no-cache-dir',
+            '-r', "%s/pip.txt" % PATH_REQUIREMENTS,
+        ])
+
+
+def cleanup(packages):
+    if packages:
+        subprocess.check_call(['apt', 'purge', '-yqq'] + packages)
+        subprocess.check_call(['apt', 'autopurge', '-yqq'])
+        subprocess.check_call(['rm', '-rf', '/var/lib/apt/lists/*', '/tmp/*'])
+
+
+# Read requirements
+build_deps = read_requirements("%s/build_deps.txt" % PATH_REQUIREMENTS)
+apt = read_requirements("%s/apt.txt" % PATH_REQUIREMENTS)
+pip = read_requirements("%s/pip.txt" % PATH_REQUIREMENTS)
+
+# Install build dependencies, if any
+if pip:
+    install_apt(build_deps)
+install_apt(apt)
+install_pip(pip)
+
+# Cleanup
+cleanup(build_deps)
+
+# Remove all requirements files, to allow nested builds without reinstalling
+subprocess.check_call(["rm", "-f", "%s/*.txt" % PATH_REQUIREMENTS])

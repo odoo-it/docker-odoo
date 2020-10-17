@@ -35,7 +35,7 @@ if INSTALL_ODOO:
     # Pip Install
     pip_args = ['--no-cache-dir', '--editable']
     if ODOO_VERSION in ['7.0', '8.0']:
-        pip_args += ['--no-deps']
+        pip_args = ['--no-deps'] + pip_args
     subprocess.check_call(
         ['pip', 'install'] + pip_args + [dest_path],
         stderr=sys.stderr,
