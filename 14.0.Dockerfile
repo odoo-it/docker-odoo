@@ -18,18 +18,6 @@ ENV GIT_AUTHOR_NAME=docker-odoo \
     PIP_NO_CACHE_DIR=0 \
     PYTHONOPTIMIZE=1
 
-# Default values of env variables used by scripts
-ENV ODOO_SERVER=odoo \
-    UNACCENT=True \
-    PROXY_MODE=True \
-    WITHOUT_DEMO=True \
-    WAIT_PG=true \
-    PGUSER=odoo \
-    PGPASSWORD=odoo \
-    PGHOST=db \
-    PGPORT=5432 \
-    ADMIN_PASSWORD=admin
-
 # Other requirements and recommendations to run Odoo
 # See https://github.com/$ODOO_SOURCE/blob/$ODOO_VERSION/debian/control
 ARG WKHTMLTOPDF_VERSION=0.12.5
@@ -64,14 +52,11 @@ RUN apt-get -qq update \
     && rm -Rf wkhtmltox.deb /var/lib/apt/lists/* /tmp/* \
     && sync
 
+# Install Odoo hard & soft dependencies, and Doodba utilities
 ARG ODOO_VERSION=14.0
 ARG ODOO_SOURCE=odoo/odoo
-ARG ODOO_SOURCE_DEPTH=1
 ENV ODOO_VERSION="$ODOO_VERSION"
 ENV ODOO_SOURCE="$ODOO_SOURCE"
-ENV ODOO_SOURCE_DEPTH="$ODOO_SOURCE_DEPTH"
-
-# Install Odoo hard & soft dependencies, and Doodba utilities
 RUN build_deps=" \
         build-essential \
         libfreetype6-dev \
@@ -94,18 +79,18 @@ RUN build_deps=" \
     " \
     && apt-get update \
     && apt-get install -yqq --no-install-recommends $build_deps \
+    && pip install --no-cache-dir -r https://raw.githubusercontent.com/$ODOO_SOURCE/$ODOO_VERSION/requirements.txt \
     && pip install --no-cache-dir \
-        -r https://raw.githubusercontent.com/$ODOO_SOURCE/$ODOO_VERSION/requirements.txt \
+        git+git://github.com/OCA/openupgradelib.git \
         git-aggregator \
+        click-odoo-contrib \
+        phonenumbers \
         ipython \
         pysnooper \
         ipdb \
-        git+git://github.com/OCA/openupgradelib.git \
-        click-odoo-contrib \
-        geoip2 \
         pg_activity \
-        phonenumbers \
-    && (python3 -m compileall -q /usr/local/lib/python3.8/ || true) \
+        geoip2 \
+    && (python3 -m compileall -q /usr/local/lib/python3.7/ || true) \
     && apt-get purge -yqq $build_deps \
     && apt-get autopurge -yqq \
     && rm -Rf /var/lib/apt/lists/* /tmp/*
@@ -122,15 +107,11 @@ LABEL org.label-schema.schema-version="$VERSION" \
       org.label-schema.vcs-url="https://github.com/ingadhoc/docker-odoo"
 
 # Create directory structure
-ENV SOURCES /home/odoo/src
-ENV CUSTOM /home/odoo/custom
-ENV RESOURCES /home/odoo/.resources
-ENV CONFIG_DIR /home/odoo/.config
-ENV DATA_DIR /home/odoo/data
-
-ENV OPENERP_SERVER=$CONFIG_DIR/odoo.conf
-ENV ODOO_RC=$OPENERP_SERVER
-
+ENV SOURCES=/home/odoo/src \
+    CUSTOM=/home/odoo/custom \
+    RESOURCES=/home/odoo/.resources \
+    CONFIG_DIR=/home/odoo/.config \
+    DATA_DIR=/home/odoo/data
 RUN mkdir -p $SOURCES/repositories && \
     mkdir -p $CUSTOM/repositories && \
     mkdir -p $DATA_DIR && \
@@ -139,7 +120,12 @@ RUN mkdir -p $SOURCES/repositories && \
     chown -R odoo.odoo /home/odoo && \
     sync
 
+# Config env
+ENV OPENERP_SERVER=$CONFIG_DIR/odoo.conf
+ENV ODOO_RC=$OPENERP_SERVER
+
 # Usefull aliases
+# TODO: Move it to the project itself? or maybe a binary in docker-odoo-saas ?
 RUN echo "alias odoo-shell='odoo shell --shell-interface ipython --no-http --limit-memory-hard=0 --limit-memory-soft=0'" >> /home/odoo/.bashrc
 
 # Image building scripts
@@ -148,37 +134,54 @@ COPY build.d $RESOURCES/build.d
 COPY conf.d $RESOURCES/conf.d
 COPY entrypoint.d $RESOURCES/entrypoint.d
 COPY entrypoint.sh $RESOURCES/entrypoint.sh
-COPY resources/* $RESOURCES/
 RUN    ln /usr/local/bin/direxec $RESOURCES/entrypoint \
     && ln /usr/local/bin/direxec $RESOURCES/build \
     && chown -R odoo.odoo $RESOURCES \
     && chmod -R a+rx $RESOURCES/entrypoint* $RESOURCES/build* /usr/local/bin \
     && sync
 
+# onbuild version
+# This is the real deal
+
+FROM base AS onbuild
+ONBUILD VOLUME ["/home/odoo/data"]
+ONBUILD WORKDIR "/home/odoo"
+ONBUILD ENTRYPOINT ["/home/odoo/.resources/entrypoint.sh"]
+ONBUILD CMD ["odoo"]
+# ODOO CONF DEFAULT VALUES
+ONBUILD ARG UNACCENT=true
+ONBUILD ARG PROXY_MODE=true
+ONBUILD ARG WITHOUT_DEMO=true
+ONBUILD ARG WAIT_PG=true
+ONBUILD ARG PGUSER=odoo
+ONBUILD ARG PGPASSWORD=odoo
+ONBUILD ARG PGHOST=db
+ONBUILD ARG PGPORT=5432
+ONBUILD ARG ADMIN_PASSWORD=admin
+# BUILD ARGS
+ONBUILD ARG GITHUB_USER
+ONBUILD ARG GITHUB_TOKEN
+ONBUILD ARG ODOO_VERSION=14.0
+ONBUILD ARG ODOO_SOURCE=odoo/odoo
+ONBUILD ARG ODOO_SOURCE_DEPTH=1
+ONBUILD ARG INSTALL_ODOO=false
+ONBUILD ARG INSTALL_ENTERPRISE=false
+# Set env from args
+ONBUILD ENV \
+    UNACCENT="$UNACCENT" \
+    PROXY_MODE="$PROXY_MODE" \
+    WITHOUT_DEMO="$WITHOUT_DEMO" \
+    WAIT_PG="$WAIT_PG" \
+    PGUSER="$PGUSER" \
+    PGPASSWORD="$PGPASSWORD" \
+    PGHOST="$PGHOST" \
+    PGPORT="$PGPORT" \
+    ADMIN_PASSWORD="$ADMIN_PASSWORD" \
+    ODOO_VERSION="$ODOO_VERSION" \
+    ODOO_SOURCE="$ODOO_SOURCE" \
+    ODOO_SOURCE_DEPTH="$ODOO_SOURCE_DEPTH" \
+    INSTALL_ODOO="$INSTALL_ODOO" \
+    INSTALL_ENTERPRISE="$INSTALL_ENTERPRISE"
 # Run build scripts
-RUN $RESOURCES/build && sync
-
-# Entrypoint
-WORKDIR "/home/odoo"
-ENTRYPOINT ["/home/odoo/.resources/entrypoint.sh"]
-CMD ["odoo"]
-USER odoo
-
-#
-#   Odoo
-#
-
-FROM base AS odoo
-RUN git clone --single-branch --depth $ODOO_SOURCE_DEPTH --branch $ODOO_VERSION https://github.com/$ODOO_SOURCE $SOURCES/odoo
-RUN pip install --user --no-cache-dir -e $SOURCES/odoo
-
-#
-#   Odoo Enterprise
-#
-
-FROM odoo AS enterprise
-ARG GITHUB_USER
-ARG GITHUB_TOKEN
-ENV GITHUB_USER="$GITHUB_USER"
-ENV GITHUB_TOKEN="$GITHUB_TOKEN"
-RUN git clone --single-branch --depth $ODOO_SOURCE_DEPTH --branch $ODOO_VERSION https://$GITHUB_USER:$GITHUB_TOKEN@github.com/odoo/enterprise.git $SOURCES/enterprise
+ONBUILD RUN $RESOURCES/build && sync
+ONBUILD USER odoo
