@@ -162,9 +162,6 @@ ENTRYPOINT ["/home/odoo/.resources/entrypoint.sh"]
 CMD ["odoo"]
 USER odoo
 
-# HACK Special case for Werkzeug
-RUN pip install --user Werkzeug==0.14.1
-
 #
 #   Odoo
 #
