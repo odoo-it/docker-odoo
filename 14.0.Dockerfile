@@ -1,4 +1,4 @@
-FROM python:3.7-slim-buster AS base
+FROM python:3.8-slim-buster AS base
 
 EXPOSE 8069 8072
 
@@ -103,7 +103,7 @@ RUN build_deps=" \
         geoip2 \
         pg_activity \
         phonenumbers \
-    && (python3 -m compileall -q /usr/local/lib/python3.7/ || true) \
+    && (python3 -m compileall -q /usr/local/lib/python3.8/ || true) \
     && apt-get purge -yqq $build_deps \
     && apt-get autopurge -yqq \
     && rm -Rf /var/lib/apt/lists/* /tmp/*
