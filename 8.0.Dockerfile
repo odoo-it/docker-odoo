@@ -177,6 +177,10 @@ ONBUILD ENV \
     INSTALL_ODOO="$INSTALL_ODOO" \
     INSTALL_ENTERPRISE="$INSTALL_ENTERPRISE"
 # Run build scripts
+ONBUILD COPY conf.d/*       $RESOURCES/conf.d/
+ONBUILD COPY entrypoint.d/* $RESOURCES/entrypoint.d/
+ONBUILD COPY build.d/*      $RESOURCES/build.d/
+ONBUILD COPY requirements/* $RESOURCES/requirements/
 ONBUILD RUN $RESOURCES/build && sync
 ONBUILD USER odoo
 # HACK Special case for Werkzeug

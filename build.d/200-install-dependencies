@@ -51,6 +51,8 @@ apt = read_requirements("%s/apt.txt" % PATH_REQUIREMENTS)
 pip = read_requirements("%s/pip.txt" % PATH_REQUIREMENTS)
 
 # Install build dependencies, if any
+if apt or build_deps:
+    subprocess.check_call(['apt', 'update', '-y'])
 if pip:
     install_apt(build_deps)
 install_apt(apt)

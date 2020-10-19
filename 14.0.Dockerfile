@@ -90,7 +90,7 @@ RUN build_deps=" \
         ipdb \
         pg_activity \
         geoip2 \
-    && (python3 -m compileall -q /usr/local/lib/python3.7/ || true) \
+    && (python3 -m compileall -q /usr/local/lib/python3.8/ || true) \
     && apt-get purge -yqq $build_deps \
     && apt-get autopurge -yqq \
     && rm -Rf /var/lib/apt/lists/* /tmp/*
@@ -183,5 +183,9 @@ ONBUILD ENV \
     INSTALL_ODOO="$INSTALL_ODOO" \
     INSTALL_ENTERPRISE="$INSTALL_ENTERPRISE"
 # Run build scripts
-ONBUILD RUN $RESOURCES/build && sync
+ONBUILD COPY conf.d/*       $RESOURCES/conf.d/
+ONBUILD COPY entrypoint.d/* $RESOURCES/entrypoint.d/
+ONBUILD COPY build.d/*      $RESOURCES/build.d/
+ONBUILD COPY requirements/* $RESOURCES/requirements/
+ONBUILD RUN  $RESOURCES/build && sync
 ONBUILD USER odoo
