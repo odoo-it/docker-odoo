@@ -90,17 +90,6 @@ RUN build_deps=" \
     && apt-get autopurge -yqq \
     && rm -Rf /var/lib/apt/lists/* /tmp/*
 
-# Metadata
-ARG VCS_REF
-ARG BUILD_DATE
-ARG VERSION
-LABEL org.label-schema.schema-version="$VERSION" \
-      org.label-schema.vendor=Adhoc \
-      org.label-schema.license=Apache-2.0 \
-      org.label-schema.build-date="$BUILD_DATE" \
-      org.label-schema.vcs-ref="$VCS_REF" \
-      org.label-schema.vcs-url="https://github.com/ingadhoc/docker-odoo"
-
 # Create directory structure
 ENV SOURCES=/home/odoo/src \
     CUSTOM=/home/odoo/custom \
@@ -134,6 +123,17 @@ RUN    ln /usr/local/bin/direxec $RESOURCES/entrypoint \
     && chown -R odoo.odoo $RESOURCES \
     && chmod -R a+rx $RESOURCES/entrypoint* $RESOURCES/build* /usr/local/bin \
     && sync
+
+# Metadata
+ARG VCS_REF
+ARG BUILD_DATE
+ARG VERSION
+LABEL org.label-schema.schema-version="$VERSION" \
+      org.label-schema.vendor=Adhoc \
+      org.label-schema.license=Apache-2.0 \
+      org.label-schema.build-date="$BUILD_DATE" \
+      org.label-schema.vcs-ref="$VCS_REF" \
+      org.label-schema.vcs-url="https://github.com/ingadhoc/docker-odoo"
 
 # onbuild version
 # This is the real deal
