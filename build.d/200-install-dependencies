@@ -26,7 +26,12 @@ def read_requirements(filepath):
 def install_apt(packages):
     if packages:
         subprocess.check_call(
-            ['apt', 'install', '-y', '--no-install-recommends'] + packages
+            [
+                'apt-get', 'install', '-y',
+                '--no-install-recommends',
+                '-o', 'Dpkg::Options::=--force-confdef',
+                '-o', 'Dpkg::Options::=--force-confold',
+            ] + packages
         )
 
 
@@ -40,8 +45,8 @@ def install_pip(packages):
 
 def cleanup(packages):
     if packages:
-        subprocess.check_call(['apt', 'purge', '-yqq'] + packages)
-        subprocess.check_call(['apt', 'autopurge', '-yqq'])
+        subprocess.check_call(['apt-get', 'purge', '-y'] + packages)
+        subprocess.check_call(['apt-get', 'autoremove', '-y'])
         subprocess.check_call(['rm', '-rf', '/var/lib/apt/lists/*', '/tmp/*'])
 
 
@@ -52,7 +57,7 @@ pip = read_requirements("%s/pip.txt" % PATH_REQUIREMENTS)
 
 # Install build dependencies, if any
 if apt or build_deps:
-    subprocess.check_call(['apt', 'update', '-y'])
+    subprocess.check_call(['apt-get', 'update', '-y'])
 if pip:
     install_apt(build_deps)
 install_apt(apt)
