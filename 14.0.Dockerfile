@@ -55,8 +55,6 @@ RUN apt-get -qq update \
 # Install Odoo hard & soft dependencies, and Doodba utilities
 ARG ODOO_VERSION=14.0
 ARG ODOO_SOURCE=odoo/odoo
-ENV ODOO_VERSION="$ODOO_VERSION"
-ENV ODOO_SOURCE="$ODOO_SOURCE"
 RUN build_deps=" \
         build-essential \
         libfreetype6-dev \
@@ -177,11 +175,7 @@ ONBUILD ENV \
     PGHOST="$PGHOST" \
     PGPORT="$PGPORT" \
     ADMIN_PASSWORD="$ADMIN_PASSWORD" \
-    ODOO_VERSION="$ODOO_VERSION" \
-    ODOO_SOURCE="$ODOO_SOURCE" \
-    ODOO_SOURCE_DEPTH="$ODOO_SOURCE_DEPTH" \
-    INSTALL_ODOO="$INSTALL_ODOO" \
-    INSTALL_ENTERPRISE="$INSTALL_ENTERPRISE"
+    ODOO_VERSION="$ODOO_VERSION"
 # Run build scripts
 ONBUILD COPY conf.d/*       $RESOURCES/conf.d/
 ONBUILD COPY entrypoint.d/* $RESOURCES/entrypoint.d/

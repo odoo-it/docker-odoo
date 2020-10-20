@@ -60,8 +60,6 @@ RUN ln -s /usr/bin/nodejs /usr/local/bin/node \
 # https://docs.docker.com/engine/reference/builder/#/impact-on-build-caching
 ARG ODOO_VERSION=12.0
 ARG ODOO_SOURCE=odoo/odoo
-ENV ODOO_VERSION="$ODOO_VERSION"
-ENV ODOO_SOURCE="$ODOO_SOURCE"
 RUN debs="libldap2-dev libsasl2-dev" \
     && apt-get update \
     && apt-get install -yqq --no-install-recommends $debs \
@@ -162,11 +160,7 @@ ONBUILD ENV \
     PGHOST="$PGHOST" \
     PGPORT="$PGPORT" \
     ADMIN_PASSWORD="$ADMIN_PASSWORD" \
-    ODOO_VERSION="$ODOO_VERSION" \
-    ODOO_SOURCE="$ODOO_SOURCE" \
-    ODOO_SOURCE_DEPTH="$ODOO_SOURCE_DEPTH" \
-    INSTALL_ODOO="$INSTALL_ODOO" \
-    INSTALL_ENTERPRISE="$INSTALL_ENTERPRISE"
+    ODOO_VERSION="$ODOO_VERSION"
 # Run build scripts
 ONBUILD COPY conf.d/*       $RESOURCES/conf.d/
 ONBUILD COPY entrypoint.d/* $RESOURCES/entrypoint.d/

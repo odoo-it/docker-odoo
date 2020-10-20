@@ -71,8 +71,6 @@ RUN gem install --no-rdoc --no-ri --no-update-sources autoprefixer-rails --versi
 # https://docs.docker.com/engine/reference/builder/#/impact-on-build-caching
 ARG ODOO_VERSION=8.0
 ARG ODOO_SOURCE=odoo/odoo
-ENV ODOO_VERSION="$ODOO_VERSION"
-ENV ODOO_SOURCE="$ODOO_SOURCE"
 RUN debs="python-dev build-essential libxml2-dev libxslt1-dev libjpeg-dev libfreetype6-dev liblcms2-dev libopenjpeg-dev libtiff5-dev tk-dev tcl-dev linux-headers-amd64 libpq-dev libldap2-dev libsasl2-dev" \
     && apt-get update \
     && apt-get install -yqq --no-install-recommends $debs \
@@ -171,11 +169,7 @@ ONBUILD ENV \
     PGHOST="$PGHOST" \
     PGPORT="$PGPORT" \
     ADMIN_PASSWORD="$ADMIN_PASSWORD" \
-    ODOO_VERSION="$ODOO_VERSION" \
-    ODOO_SOURCE="$ODOO_SOURCE" \
-    ODOO_SOURCE_DEPTH="$ODOO_SOURCE_DEPTH" \
-    INSTALL_ODOO="$INSTALL_ODOO" \
-    INSTALL_ENTERPRISE="$INSTALL_ENTERPRISE"
+    ODOO_VERSION="$ODOO_VERSION"
 # Run build scripts
 ONBUILD COPY conf.d/*       $RESOURCES/conf.d/
 ONBUILD COPY entrypoint.d/* $RESOURCES/entrypoint.d/
