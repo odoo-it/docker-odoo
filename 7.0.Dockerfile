@@ -175,8 +175,9 @@ ONBUILD ENV \
 ONBUILD COPY conf.d/*       $RESOURCES/conf.d/
 ONBUILD COPY entrypoint.d/* $RESOURCES/entrypoint.d/
 ONBUILD COPY build.d/*      $RESOURCES/build.d/
+ONBUILD COPY repos.d/*      $RESOURCES/repos.d/
 ONBUILD COPY requirements/* $RESOURCES/requirements/
-ONBUILD RUN $RESOURCES/build && sync
+ONBUILD RUN  $RESOURCES/build && sync
 ONBUILD USER odoo
 # HACK Special case for Werkzeug
 ONBUILD RUN pip install --user Werkzeug==0.14.1
