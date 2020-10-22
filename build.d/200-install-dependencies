@@ -51,6 +51,8 @@ def cleanup(packages):
 
 
 # Read requirements
+# TODO: Analyze if the requirements are already installed, and avoid
+# this whole step if so. That could help optimizing nested builds.
 build_deps = read_requirements("%s/build_deps.txt" % PATH_REQUIREMENTS)
 apt = read_requirements("%s/apt.txt" % PATH_REQUIREMENTS)
 pip = read_requirements("%s/pip.txt" % PATH_REQUIREMENTS)

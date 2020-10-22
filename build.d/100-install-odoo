@@ -49,6 +49,10 @@ if INSTALL_ODOO:
 
 
 if INSTALL_ENTERPRISE:
+    if not os.environ.get("GITHUB_USER") and os.environ.get("GITHUB_TOKEN"):
+        raise Exception(
+            "Unable to install enterprise without "
+            "GITHUB_USER and GITHUB_TOKEN")
     # Clone
     source_url = "https://%s:%s@github.com/odoo/enterprise.git" % (
         os.environ.get("GITHUB_USER"),
