@@ -1,4 +1,4 @@
-FROM python:3.5-stretch AS base
+FROM python:3.6.9-slim-buster AS base
 
 EXPOSE 8069 8072
 
@@ -24,14 +24,19 @@ ARG WKHTMLTOPDF_VERSION=0.12.5
 ARG WKHTMLTOPDF_CHECKSUM='1140b0ab02aa6e17346af2f14ed0de807376de475ba90e1db3975f112fbd20bb'
 RUN apt-get -qq update \
     && apt-get -yqq upgrade \
+    && apt-get install -yqq --no-install-recommends curl \
     && apt-get install -yqq --no-install-recommends \
         chromium \
         ffmpeg \
         fonts-liberation2 \
         gettext-base \
+        git \
         gnupg2 \
         locales-all \
         nano \
+        npm \
+        wget \
+        openssh-client \
         ruby \
         telnet \
         vim \
@@ -60,9 +65,28 @@ RUN ln -s /usr/bin/nodejs /usr/local/bin/node \
 # https://docs.docker.com/engine/reference/builder/#/impact-on-build-caching
 ARG ODOO_VERSION=12.0
 ARG ODOO_SOURCE=odoo/odoo
-RUN debs="libldap2-dev libsasl2-dev" \
+RUN build_deps=" \
+        build-essential \
+        libfreetype6-dev \
+        libfribidi-dev \
+        libghc-zlib-dev \
+        libharfbuzz-dev \
+        libjpeg-dev \
+        liblcms2-dev \
+        libldap2-dev \
+        libopenjp2-7-dev \
+        libpq-dev \
+        libsasl2-dev \
+        libtiff5-dev \
+        libwebp-dev \
+        libxml2-dev \
+        libxslt-dev \
+        tcl-dev \
+        tk-dev \
+        zlib1g-dev \
+    " \
     && apt-get update \
-    && apt-get install -yqq --no-install-recommends $debs \
+    && apt-get install -yqq --no-install-recommends $build_deps \
     && pip install --no-cache-dir -r https://raw.githubusercontent.com/$ODOO_SOURCE/$ODOO_VERSION/requirements.txt \
     && pip install --no-cache-dir \
         git+git://github.com/OCA/openupgradelib.git \
@@ -74,8 +98,8 @@ RUN debs="libldap2-dev libsasl2-dev" \
         ipdb \
         pg_activity \
         'websocket-client~=0.53' \
-    && (python3 -m compileall -q /usr/local/lib/python3.5/ || true) \
-    && apt-get purge -yqq $debs \
+    && (python3 -m compileall -q /usr/local/lib/python3.6/ || true) \
+    && apt-get purge -yqq $build_deps \
     && rm -Rf /var/lib/apt/lists/* /tmp/*
 
 # Create directory structure
