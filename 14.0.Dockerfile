@@ -86,6 +86,8 @@ RUN build_deps=" \
         libsasl2-dev \
         libtiff5-dev \
         libwebp-dev \
+        libxml2-dev \
+        libxslt-dev \
         tcl-dev \
         tk-dev \
         zlib1g-dev \
