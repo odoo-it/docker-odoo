@@ -1,4 +1,4 @@
-FROM python:3.7-slim-buster AS base
+FROM python:3.6.9-slim-buster AS base
 
 EXPOSE 8069 8072
 
@@ -69,6 +69,8 @@ RUN build_deps=" \
         libsasl2-dev \
         libtiff5-dev \
         libwebp-dev \
+        libxml2-dev \
+        libxslt-dev \
         tcl-dev \
         tk-dev \
         zlib1g-dev \
@@ -85,7 +87,8 @@ RUN build_deps=" \
         pysnooper \
         ipdb \
         pg_activity \
-    && (python3 -m compileall -q /usr/local/lib/python3.7/ || true) \
+        geoip2 \
+    && (python3 -m compileall -q /usr/local/lib/python3.6/ || true) \
     && apt-get purge -yqq $build_deps \
     && apt-get autopurge -yqq \
     && rm -Rf /var/lib/apt/lists/* /tmp/*

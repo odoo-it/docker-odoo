@@ -1,4 +1,4 @@
-FROM python:3.8-slim-buster AS base
+FROM python:3.6.9-slim-buster AS base
 
 EXPOSE 8069 8072
 
@@ -52,7 +52,7 @@ RUN apt-get -qq update \
     && rm -Rf wkhtmltox.deb /var/lib/apt/lists/* /tmp/* \
     && sync
 
-# Install Odoo hard & soft dependencies, and Doodba utilities
+# Install Odoo hard & soft dependencies, and utilities
 ARG ODOO_VERSION=14.0
 ARG ODOO_SOURCE=odoo/odoo
 RUN build_deps=" \
@@ -88,7 +88,7 @@ RUN build_deps=" \
         ipdb \
         pg_activity \
         geoip2 \
-    && (python3 -m compileall -q /usr/local/lib/python3.8/ || true) \
+    && (python3 -m compileall -q /usr/local/lib/python3.6/ || true) \
     && apt-get purge -yqq $build_deps \
     && apt-get autopurge -yqq \
     && rm -Rf /var/lib/apt/lists/* /tmp/*
