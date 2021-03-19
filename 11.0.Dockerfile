@@ -39,7 +39,7 @@ RUN apt-get -qq update \
         sudo \
     && echo 'deb http://apt.postgresql.org/pub/repos/apt/ stretch-pgdg main' >> /etc/apt/sources.list.d/postgresql.list \
     && curl -SL https://www.postgresql.org/media/keys/ACCC4CF8.asc | apt-key add - \
-    && curl https://bootstrap.pypa.io/get-pip.py | python3 /dev/stdin \
+    && curl https://bootstrap.pypa.io/pip/3.5/get-pip.py | python3 /dev/stdin \
     && curl -sL https://deb.nodesource.com/setup_6.x | bash - \
     && apt-get update \
     && apt-get install -yqq --no-install-recommends nodejs postgresql-client \
