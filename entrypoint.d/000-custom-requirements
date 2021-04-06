@@ -19,6 +19,7 @@ if CUSTOM_REQUIREMENTS:
     subprocess.check_call([
         'pip',
         'install',
+        '--user',
         '--no-cache-dir',
         '-r',
         custom_file,

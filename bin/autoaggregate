@@ -28,6 +28,13 @@ parser.add_argument(
 )
 
 parser.add_argument(
+    "-u",
+    "--user",
+    action="store_true",
+    help="If --install is set, run pip with --user.",
+)
+
+parser.add_argument(
     "-d",
     "--dependencies",
     action="store_true",
@@ -81,4 +88,11 @@ if args.install:
 
     for req_file in req_files:
         logger.info('Intalling %s' % req_file)
-        os.system("pip install --no-cache-dir -r %s" % req_file)
+        pip_args = ["--no-cache-dir"]
+        if args.user:
+            pip_args += ["--user"]
+        check_call(
+            ['pip', 'install'] + pip_args + ["-r", req_file],
+            stderr=sys.stderr,
+            stdout=sys.stdout,
+        )
