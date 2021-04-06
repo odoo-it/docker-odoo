@@ -173,7 +173,10 @@ ONBUILD COPY entrypoint.d/* $RESOURCES/entrypoint.d/
 ONBUILD COPY build.d/*      $RESOURCES/build.d/
 ONBUILD COPY repos.d/*      $RESOURCES/repos.d/
 ONBUILD COPY requirements/* $RESOURCES/requirements/
-ONBUILD RUN  $RESOURCES/build && sync
+ONBUILD RUN  chown -R odoo.odoo $RESOURCES \
+             && chmod -R a+rx $RESOURCES/entrypoint* $RESOURCES/build* \
+             && $RESOURCES/build \
+             && sync
 ONBUILD USER odoo
 # HACK Special case for Werkzeug
 ONBUILD RUN pip install --user Werkzeug==0.14.1
