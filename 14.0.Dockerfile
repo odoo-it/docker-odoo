@@ -111,10 +111,6 @@ RUN mkdir -p $SOURCES/repositories && \
 ENV OPENERP_SERVER=$CONFIG_DIR/odoo.conf
 ENV ODOO_RC=$OPENERP_SERVER
 
-# Usefull aliases
-# TODO: Move it to the project itself? or maybe a binary in docker-odoo-saas ?
-RUN echo "alias odoo-shell='odoo shell --shell-interface ipython --no-http --limit-memory-hard=0 --limit-memory-soft=0'" >> /home/odoo/.bashrc
-
 # Image building scripts
 COPY bin/* /usr/local/bin/
 COPY build.d $RESOURCES/build.d
