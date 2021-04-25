@@ -1,0 +1,23 @@
+version: '2.4'
+services:
+
+    db:
+        image: postgres:10.6
+        environment:
+            POSTGRES_USER: odoo
+            POSTGRES_PASSWORD: odoo
+            POSTGRES_DB: postgres
+            PGDATA: /var/lib/postgresql/data/pgdata
+
+    odoo:
+        build:
+            context: .
+            dockerfile: Dockerfile
+            args:
+                DOCKER_REPO: $DOCKER_REPO
+                DOCKER_TAG: $DOCKER_TAG
+        environment:
+            PGDATABASE: testdb
+            WITHOUT_DEMO:
+        depends_on:
+            - db

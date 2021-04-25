@@ -22,25 +22,17 @@ same. This is the structure:
         build.d/
         conf.d/
         entrypoint.d/
-        repos.d/
-        requirements/
-            build_deps.txt
-            apt.txt
-            pip.txt
 
 | Path                      | Description                                                                                                   |
 | ------------------------- | ------------------------------------------------------------------------------------------------------------- |
 | `custom/repositories`     | Repositories cloned here are loaded with higher priority. Usefull for local development.                      |
-| `src/odoo`                | Odoo source code. Installed automatically if `INCLUDE_ODOO`.                                                  |
-| `src/enterprise`          | Odoo enterprise code. Installed automatically if `INCLUDE_ENTERPRISE`.                                        |
-| `src/repositories`        | Project repositories. They are automatically aggregated from `repos.d`.                                       |
+| `src/odoo`                | Empty. Path where odoo source code is expected to be.                                                         |
+| `src/enterprise`          | Empty. Path where odoo enteprise source code is expected to be (if required).                                 |
+| `src/repositories`        | Empty. Path where your project's addon repositories are expected to be.                                       |
 | `data/`                   | Odoo data directory. You usually want to persist it.                                                          |
 | `.config/odoo.conf`       | Odoo configuration file. Generated automatically from `conf.d`.                                               |
-| `.resources/build.d`      | Image build scripts. They run in alphabetical order ON BUILD.                                                 |
 | `.resources/conf.d`       | Files here will be environment-variable-expanded and concatenated in `odoo.conf` in the entrypoint.           |
 | `.resources/entrypoint.d` | Any executables found here will be run when you launch your container.                                        |
-| `.resources/repos.d`      | All repositories files in this directory will be aggregated ON BUILD by git-aggregator in `src/repositories`. |
-| `.resources/requirements` | Image dependencies declarations. They're installed ON BUILD.                                                  |
 
 ## Runtime environment variables
 
@@ -94,17 +86,7 @@ The following variables can customize entrypoint behaviour and `odoo.conf`:
 
 ## Configuration
 
-The following ON BUILD arguments are available to customize some behaviours:
+The following build arguments are available to customize some behaviours:
 
 -   `ODOO_SOURCE` (default: `odoo/odoo`)
--   `ODOO_SOURCE_DEPTH` (default: `1`)
--   `INSTALL_ODOO` (default: `false`)
--   `INSTALL_ENTERPRISE` (default: `false`)
--   `GITHUB_USER`: Required if `INSTALL_ENTERPRISE`
--   `GITHUB_TOKEN`: Required if `INSTALL_ENTERPRISE`
-
-For convenience, the following arguments are available when building this image:
-
--   `BUILD_TAG_BASE`: besides building the -onbuild image, will also build a tag without onbuild.
--   `BUILD_TAG_COMMUNITY`: besides building the -onbuild image, will also build a tag containing Odoo CE.
--   `BUILD_TAG_ENTERPRISE`: besides building the -onbuild image, will also build a tag containing Odoo EE.
+-   `ODOO_VERSION` (default: `$DOCKER_TAG`)

@@ -14,14 +14,8 @@ def get_env_bool(key):
 PGDATABASE = os.environ.get("PGDATABASE")
 AUTO_UPDATE_MODULES = get_env_bool("AUTO_UPDATE_MODULES")
 CLICK_ODOO_UPDATE_WATCHER_MAX_SECONDS = os.environ.get(
-    "CLICK_ODOO_UPDATE_WATCHER_MAX_SECONDS", 60)
-
-# Backwards compatibility
-if not AUTO_UPDATE_MODULES:
-    AUTO_UPDATE_MODULES = get_env_bool("FIXDBS")
-    if AUTO_UPDATE_MODULES:
-        _logger.warning(
-            "FIXBDS is deprecated. Use AUTO_UPDATE_MODULES instead.")
+    "CLICK_ODOO_UPDATE_WATCHER_MAX_SECONDS", 60
+)
 
 # Auto update modules
 if AUTO_UPDATE_MODULES and PGDATABASE:

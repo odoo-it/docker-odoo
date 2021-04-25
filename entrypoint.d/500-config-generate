@@ -46,7 +46,7 @@ with closing(StringIO()) as resultfp:
             line = Template(line).substitute(os.environ)
         except KeyError as e:
             # If error, simply ignore this line
-            _logger.warning('Skipping config line: %s (missing env)' % (line))
+            _logger.debug('Skipping config line: %s (missing env)' % (line))
             continue
         result.append(line)
     # Merge config file

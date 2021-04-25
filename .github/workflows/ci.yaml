@@ -1,0 +1,63 @@
+name: ci
+
+on:
+  pull_request:
+  push:
+    branches:
+      - master
+
+jobs:
+
+  build-test-push:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        odoo_version:
+          - "14.0"
+          - "13.0"
+          - "12.0"
+          - "11.0"
+          - "10.0"
+
+    env:
+      ODOO_VERSION: ${{ matrix.odoo_version }}
+      DOCKER_REPO: odoo-it/docker-odoo
+      DOCKER_TAG: ${{ matrix.odoo_version }}
+      GIT_SHA1: ${{ github.sha }}
+      RELEASE: ${{ github.event.release.tag_name }}
+      # Config
+      DOCKER_BUILDKIT: 1
+      TEST: 0
+
+    steps:
+      # Prepare
+      - name: Checkout
+        uses: actions/checkout@v2
+      # Build image
+      - name: Build Image
+        run: docker build -f $DOCKER_TAG.Dockerfile --build-arg ODOO_VERSION=$ODOO_VERSION -t $DOCKER_REPO:$DOCKER_TAG .
+      # Test
+      - name: Run tests
+        if: env.TEST == 1
+        run: |
+          docker-compose -f tests/docker-compose.yml build
+          docker-compose -f tests/docker-compose.yml run --rm odoo odoo --init=all --test-enable --stop-after-init
+      # Push to Github Packages
+      - name: Login to Github Packages
+        if: github.repository == 'odoo-it/docker-odoo' && github.ref == 'refs/heads/master'
+        uses: docker/login-action@v1 
+        with:
+          registry: ghcr.io
+          username: ${{ github.repository_owner }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+      - name: Push to Github Packages
+        if: github.repository == 'odoo-it/docker-odoo' && github.ref == 'refs/heads/master'
+        run: |
+          docker image tag $DOCKER_REPO:$DOCKER_TAG ghcr.io/$DOCKER_REPO:$DOCKER_TAG
+          docker image push ghcr.io/$DOCKER_REPO:$DOCKER_TAG
+      - name: Tag and push release
+        if: github.repository == 'odoo-it/docker-odoo' && github.ref == 'refs/heads/master' && github.event.release.tag_name
+        run: |
+          docker image tag $DOCKER_REPO:$DOCKER_TAG $DOCKER_REPO:$DOCKER_TAG.$RELEASE
+          docker image push ghcr.io/$DOCKER_REPO:$DOCKER_TAG.$RELEASE

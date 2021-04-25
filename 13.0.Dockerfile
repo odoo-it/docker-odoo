@@ -1,13 +1,5 @@
 FROM python:3.8.5-slim-buster AS base
 
-EXPOSE 8069 8072
-
-# Enable Odoo user and filestore
-RUN useradd -md /home/odoo -s /bin/false odoo \
-    && mkdir -p /var/lib/odoo \
-    && chown -R odoo:odoo /var/lib/odoo \
-    && sync
-
 # System environment variables
 ENV GIT_AUTHOR_NAME=docker-odoo \
     GIT_COMMITTER_NAME=docker-odoo \
@@ -22,76 +14,95 @@ ENV GIT_AUTHOR_NAME=docker-odoo \
 # See https://github.com/$ODOO_SOURCE/blob/$ODOO_VERSION/debian/control
 ARG WKHTMLTOPDF_VERSION=0.12.5
 ARG WKHTMLTOPDF_CHECKSUM='1140b0ab02aa6e17346af2f14ed0de807376de475ba90e1db3975f112fbd20bb'
+ARG APT_REQUIREMENTS="\
+    git \
+    curl \
+    wget \
+    chromium \
+    ffmpeg \
+    fonts-liberation2 \
+    gettext-base \
+    gnupg2 \
+    locales-all \
+    npm \
+    zlibc \
+    "
+ARG APT_TOOL_PACKAGES="\
+    nano \
+    openssh-client \
+    telnet \
+    htop \
+    ftp \
+    rsync \
+"
 RUN apt-get -qq update \
-    && apt-get install -yqq --no-install-recommends \
-        curl \
+    && apt-get install -yqq --no-install-recommends $APT_REQUIREMENTS \
+    && apt-get install -yqq --no-install-recommends $APT_TOOL_PACKAGES \
+    # wkhtmltopdf
     && curl -SLo wkhtmltox.deb https://github.com/wkhtmltopdf/wkhtmltopdf/releases/download/${WKHTMLTOPDF_VERSION}/wkhtmltox_${WKHTMLTOPDF_VERSION}-1.stretch_amd64.deb \
     && echo "${WKHTMLTOPDF_CHECKSUM}  wkhtmltox.deb" | sha256sum -c - \
-    && apt-get install -yqq --no-install-recommends \
-        ./wkhtmltox.deb \
-        chromium \
-        ffmpeg \
-        fonts-liberation2 \
-        gettext-base \
-        git \
-        gnupg2 \
-        locales-all \
-        nano \
-        npm \
-        wget \
-        openssh-client \
-        telnet \
-        vim \
-        zlibc \
-        sudo \
+    && apt-get install -yqq --no-install-recommends ./wkhtmltox.deb \
+    && rm -rf wkhtmltox.deb \
+    # postgres
     && echo 'deb http://apt.postgresql.org/pub/repos/apt/ stretch-pgdg main' >> /etc/apt/sources.list.d/postgresql.list \
     && curl -SL https://www.postgresql.org/media/keys/ACCC4CF8.asc | apt-key add - \
     && apt-get update \
     && apt-get install -yqq --no-install-recommends postgresql-client \
+    # cleanup
     && apt-get autopurge -yqq \
-    && rm -Rf wkhtmltox.deb /var/lib/apt/lists/* /tmp/* \
+    && rm -rf /var/lib/apt/lists/* /tmp/* \
     && sync
 
 # Install Odoo hard & soft dependencies, and utilities
 ARG ODOO_VERSION=13.0
 ARG ODOO_SOURCE=odoo/odoo
-RUN build_deps=" \
-        build-essential \
-        libfreetype6-dev \
-        libfribidi-dev \
-        libghc-zlib-dev \
-        libharfbuzz-dev \
-        libjpeg-dev \
-        liblcms2-dev \
-        libldap2-dev \
-        libopenjp2-7-dev \
-        libpq-dev \
-        libsasl2-dev \
-        libtiff5-dev \
-        libwebp-dev \
-        libxml2-dev \
-        libxslt-dev \
-        tcl-dev \
-        tk-dev \
-        zlib1g-dev \
-    " \
-    && apt-get update \
-    && apt-get install -yqq --no-install-recommends $build_deps \
+ARG BUILD_DEPS="\
+    build-essential \
+    libfreetype6-dev \
+    libfribidi-dev \
+    libghc-zlib-dev \
+    libharfbuzz-dev \
+    libjpeg-dev \
+    liblcms2-dev \
+    libldap2-dev \
+    libopenjp2-7-dev \
+    libpq-dev \
+    libsasl2-dev \
+    libtiff5-dev \
+    libwebp-dev \
+    libxml2-dev \
+    libxslt-dev \
+    tcl-dev \
+    tk-dev \
+    zlib1g-dev \
+    "
+ARG PIP_REQUIREMENTS="\
+    git+git://github.com/OCA/openupgradelib.git \
+    git-aggregator \
+    click-odoo-contrib \
+    phonenumbers \
+    geoip2 \
+    pg_activity \
+    pyinotify==0.9.6 \
+    python-stdnum==1.13 \
+    simplejson==3.17.0 \
+    urllib3==1.25.9 \
+    websocket-client~=0.56 \
+    astor \
+    "
+RUN apt-get update \
+    && apt-get install -yqq --no-install-recommends $BUILD_DEPS \
     && pip install --no-cache-dir -r https://raw.githubusercontent.com/$ODOO_SOURCE/$ODOO_VERSION/requirements.txt \
-    && pip install --no-cache-dir \
-        git+git://github.com/OCA/openupgradelib.git \
-        git-aggregator \
-        click-odoo-contrib \
-        phonenumbers \
-        ipython \
-        pysnooper \
-        ipdb \
-        pg_activity \
-        geoip2 \
-    && (python3 -m compileall -q /usr/local/lib/python3.6/ || true) \
-    && apt-get purge -yqq $build_deps \
+    && pip install --no-cache-dir $PIP_REQUIREMENTS \
+    && (python3 -m compileall -q /usr/local/lib/python3*/ || true) \
+    # cleanup
+    && apt-get purge -yqq $BUILD_DEPS \
     && apt-get autopurge -yqq \
-    && rm -Rf /var/lib/apt/lists/* /tmp/*
+    && rm -Rf /var/lib/apt/lists/* /tmp/* \
+    && sync
+
+# Add odoo user
+RUN useradd -md /home/odoo -s /bin/false odoo && sync
 
 # Create directory structure
 ENV SOURCES=/home/odoo/src \
@@ -121,48 +132,28 @@ RUN    ln /usr/local/bin/direxec $RESOURCES/entrypoint \
     && ln /usr/local/bin/direxec $RESOURCES/build \
     && chown -R odoo.odoo $RESOURCES \
     && chmod -R a+rx $RESOURCES/entrypoint* $RESOURCES/build* /usr/local/bin \
+    && $RESOURCES/build \
     && sync
 
-# Metadata
-ARG VCS_REF
-ARG BUILD_DATE
-ARG VERSION
-LABEL org.label-schema.schema-version="$VERSION" \
-      org.label-schema.vendor=Adhoc \
-      org.label-schema.license=Apache-2.0 \
-      org.label-schema.build-date="$BUILD_DATE" \
-      org.label-schema.vcs-ref="$VCS_REF" \
-      org.label-schema.vcs-url="https://github.com/ingadhoc/docker-odoo"
+# Docker
+EXPOSE 8069 8072
+VOLUME "/home/odoo/data"
+WORKDIR "/home/odoo"
+ENTRYPOINT ["/home/odoo/.resources/entrypoint.sh"]
+CMD "odoo"
 
-# onbuild version
-# This is the real deal
-
-FROM base AS onbuild
-ONBUILD VOLUME ["/home/odoo/data"]
-ONBUILD WORKDIR "/home/odoo"
-ONBUILD ENTRYPOINT ["/home/odoo/.resources/entrypoint.sh"]
-ONBUILD CMD ["odoo"]
 # ODOO CONF DEFAULT VALUES
-ONBUILD ARG UNACCENT=true
-ONBUILD ARG PROXY_MODE=true
-ONBUILD ARG WITHOUT_DEMO=true
-ONBUILD ARG WAIT_PG=true
-ONBUILD ARG PGUSER=odoo
-ONBUILD ARG PGPASSWORD=odoo
-ONBUILD ARG PGHOST=db
-ONBUILD ARG PGPORT=5432
-ONBUILD ARG ADMIN_PASSWORD=admin
-# BUILD ARGS
-ONBUILD ARG GITHUB_USER
-ONBUILD ARG GITHUB_TOKEN
-ONBUILD ARG ODOO_VERSION=13.0
-ONBUILD ARG ODOO_SOURCE=odoo/odoo
-ONBUILD ARG ODOO_SOURCE_DEPTH=1
-ONBUILD ARG INSTALL_ODOO=false
-ONBUILD ARG INSTALL_ENTERPRISE=false
+ARG UNACCENT=true
+ARG PROXY_MODE=true
+ARG WITHOUT_DEMO=true
+ARG WAIT_PG=true
+ARG PGUSER=odoo
+ARG PGPASSWORD=odoo
+ARG PGHOST=db
+ARG PGPORT=5432
+ARG ADMIN_PASSWORD=admin
 # Set env from args
-ONBUILD ENV \
-    UNACCENT="$UNACCENT" \
+ENV UNACCENT="$UNACCENT" \
     PROXY_MODE="$PROXY_MODE" \
     WITHOUT_DEMO="$WITHOUT_DEMO" \
     WAIT_PG="$WAIT_PG" \
@@ -172,16 +163,17 @@ ONBUILD ENV \
     PGPORT="$PGPORT" \
     ADMIN_PASSWORD="$ADMIN_PASSWORD" \
     ODOO_VERSION="$ODOO_VERSION"
-# Run build scripts
-ONBUILD COPY conf.d/*       $RESOURCES/conf.d/
-ONBUILD COPY entrypoint.d/* $RESOURCES/entrypoint.d/
-ONBUILD COPY build.d/*      $RESOURCES/build.d/
-ONBUILD COPY repos.d/*      $RESOURCES/repos.d/
-ONBUILD COPY requirements/* $RESOURCES/requirements/
-ONBUILD RUN  chown -R odoo.odoo $RESOURCES \
-             && chmod -R a+rx $RESOURCES/entrypoint* $RESOURCES/build* \
-             && $RESOURCES/build \
-             && sync
-ONBUILD USER odoo
-# HACK Special case for Werkzeug
-ONBUILD RUN pip install --user Werkzeug==0.14.1
+
+# Metadata
+ARG VCS_REF
+ARG BUILD_DATE
+ARG VERSION
+LABEL \
+    org.label-schema.schema-version="$VERSION" \
+    org.label-schema.vendor="Odoo IT" \
+    org.label-schema.license="Apache-2.0" \
+    org.label-schema.build-date="$BUILD_DATE" \
+    org.label-schema.vcs-ref="$VCS_REF" \
+    org.label-schema.vcs-url="https://github.com/odoo-it/docker-odoo"
+
+USER odoo
