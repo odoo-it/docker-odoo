@@ -17,6 +17,7 @@ PGDATABASE = os.environ.get("PGDATABASE")
 # Install unaccent
 if UNACCENT and PGDATABASE:
     try:
-        check_call(["psql", "-c", "CREATE EXTENSION IF NOT EXISTS unaccent;"])
+        res = check_output(["psql", "-c", "CREATE EXTENSION IF NOT EXISTS unaccent;"])
+        _logger.info(res)
     except Exception as e:
         pass

@@ -17,30 +17,30 @@ parser = ArgumentParser(
     description="Runs git-aggregate and install requirements")
 
 parser.add_argument(
-    "-c", "--config", type=str, default="repos.yml", help="repos.yml file"
+    "-c",
+    "--config",
+    type=str,
+    default="repos.yml",
+    help="repos.yml or directory containing *.yml files",
 )
-
 parser.add_argument(
     "-i",
     "--install",
     action="store_true",
     help="Install requirements.txt, if present.",
 )
-
 parser.add_argument(
     "-u",
     "--user",
     action="store_true",
     help="If --install is set, run pip with --user.",
 )
-
 parser.add_argument(
     "-d",
     "--dependencies",
     action="store_true",
     help="Install oca_dependencies.txt, if present.",
 )
-
 parser.add_argument(
     "-o",
     "--output",
@@ -73,7 +73,18 @@ def gitaggregate(config):
 
 
 # Initial gitaggregate
-gitaggregate(args.config)
+# If it's a directory, process all yaml files
+if os.path.isdir(args.config):
+    files = [
+        os.path.join(args.config, f)
+        for f in os.listdir(args.config)
+        if f.lower().split(".")[-1] in ("yaml", "yml")
+    ]
+    for reposfile in files:
+        gitaggregate(reposfile)
+else:
+    gitaggregate(args.config)
+
 
 # Loop through installed repos and install requirements
 if args.install:
