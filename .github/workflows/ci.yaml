@@ -5,10 +5,12 @@ on:
   push:
     branches:
       - master
+  release:
+    types: [created]
 
 jobs:
 
-  build-test-push:
+  build:
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
@@ -19,16 +21,19 @@ jobs:
           - "12.0"
           - "11.0"
           - "10.0"
+          - "9.0"
+          - "8.0"
 
     env:
-      ODOO_VERSION: ${{ matrix.odoo_version }}
       DOCKER_REPO: odoo-it/docker-odoo
       DOCKER_TAG: ${{ matrix.odoo_version }}
+      ODOO_VERSION: ${{ matrix.odoo_version }}
       GIT_SHA1: ${{ github.sha }}
       RELEASE: ${{ github.event.release.tag_name }}
       # Config
       DOCKER_BUILDKIT: 1
-      TEST: 0
+      CI_TEST: false
+      CI_PUSH: ${{ github.repository == 'odoo-it/docker-odoo' && github.ref == 'refs/heads/master' }}
 
     steps:
       # Prepare
@@ -39,25 +44,25 @@ jobs:
         run: docker build -f $DOCKER_TAG.Dockerfile --build-arg ODOO_VERSION=$ODOO_VERSION -t $DOCKER_REPO:$DOCKER_TAG .
       # Test
       - name: Run tests
-        if: env.TEST == 1
+        if: env.CI_TEST == 'true'
         run: |
           docker-compose -f tests/docker-compose.yml build
           docker-compose -f tests/docker-compose.yml run --rm odoo odoo --init=all --test-enable --stop-after-init
       # Push to Github Packages
       - name: Login to Github Packages
-        if: github.repository == 'odoo-it/docker-odoo' && github.ref == 'refs/heads/master'
+        if: env.CI_PUSH == 'true'
         uses: docker/login-action@v1 
         with:
           registry: ghcr.io
           username: ${{ github.repository_owner }}
           password: ${{ secrets.GITHUB_TOKEN }}
       - name: Push to Github Packages
-        if: github.repository == 'odoo-it/docker-odoo' && github.ref == 'refs/heads/master'
+        if: env.CI_PUSH == 'true'
         run: |
           docker image tag $DOCKER_REPO:$DOCKER_TAG ghcr.io/$DOCKER_REPO:$DOCKER_TAG
           docker image push ghcr.io/$DOCKER_REPO:$DOCKER_TAG
       - name: Tag and push release
-        if: github.repository == 'odoo-it/docker-odoo' && github.ref == 'refs/heads/master' && github.event.release.tag_name
+        if: env.CI_PUSH == 'true' && env.RELEASE != ''
         run: |
           docker image tag $DOCKER_REPO:$DOCKER_TAG $DOCKER_REPO:$DOCKER_TAG.$RELEASE
           docker image push ghcr.io/$DOCKER_REPO:$DOCKER_TAG.$RELEASE
