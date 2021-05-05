@@ -86,8 +86,9 @@ ARG PIP_REQUIREMENTS="\
     pyinotify==0.9.6 \
     python-stdnum==1.13 \
     simplejson==3.17.0 \
-    urllib3==1.25.9 \
+    urllib3==1.24.3 \
     websocket-client~=0.56 \
+    mock \
     astor \
     "
 RUN apt-get update \
