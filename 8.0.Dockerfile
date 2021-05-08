@@ -72,7 +72,7 @@ RUN apt-get -qq update \
     && rm -rf wkhtmltox.deb \
     && apt-get install -yqq --no-install-recommends --fix-broken \
     # postgres
-    && echo 'deb http://apt.postgresql.org/pub/repos/apt/ jessie-pgdg main' >> /etc/apt/sources.list.d/postgresql.list \
+    && echo 'deb http://apt-archive.postgresql.org/pub/repos/apt/ jessie-pgdg main' >> /etc/apt/sources.list.d/postgresql.list \
     && curl -SL https://www.postgresql.org/media/keys/ACCC4CF8.asc | apt-key add - \
     && apt-get update \
     && apt-get install -y --no-install-recommends postgresql-client \
