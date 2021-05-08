@@ -1,5 +1,8 @@
 # Docker Odoo
 
+A docker image ready to run Odoo, either for dev or prod deployments, that doesn't
+contain odoo.
+
 ## Image usage
 
 Basically, every directory you have to worry about is found inside `/home/odoo`.
@@ -12,6 +15,7 @@ same. This is the structure:
         odoo/
         enterprise/
         repositories/
+        user/
     data/
         addons/
         filestore/
