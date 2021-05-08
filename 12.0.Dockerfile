@@ -177,7 +177,7 @@ LABEL \
     org.label-schema.vendor="Odoo IT" \
     org.label-schema.license="Apache-2.0" \
     org.label-schema.build-date="$BUILD_DATE" \
-    org.label-schema.vcs-ref="$VCS_REF" \
+    org.label-schema.vcs-ref="$GIT_SHA1" \
     org.label-schema.vcs-url="https://github.com/odoo-it/docker-odoo"
 
 USER odoo

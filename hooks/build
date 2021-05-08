@@ -1,0 +1,15 @@
+#!/bin/bash
+set -ex
+
+# Default value in case it's not present
+if [ -z "$DOCKERFILE_PATH" ]; then
+    DOCKERFILE_PATH="$DOCKER_TAG.Dockerfile"
+fi
+
+docker image build \
+    --file "$DOCKERFILE_PATH" \
+    --build-arg GIT_SHA1="$GIT_SHA1" \
+    --build-arg BUILD_DATE="$(date --rfc-3339 ns)" \
+    --build-arg ODOO_VERSION="$DOCKER_TAG" \
+    --tag $DOCKER_REPO:$DOCKER_TAG \
+    .
