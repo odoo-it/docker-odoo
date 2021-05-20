@@ -31,7 +31,7 @@ jobs:
       RELEASE: ${{ github.event.release.tag_name }}
       # Config
       DOCKER_BUILDKIT: 1
-      CI_TEST: false
+      CI_TEST: 0
       CI_PUSH: ${{ github.repository == 'odoo-it/docker-odoo' && github.ref == 'refs/heads/master' }}
 
     steps:
@@ -43,7 +43,7 @@ jobs:
         run: hooks/build
       # Test
       - name: Run tests
-        if: env.CI_TEST == 'true'
+        if: env.CI_TEST == 'true' || env.CI_TEST == '1'
         run: |
           docker-compose -f tests/docker-compose.yml build
           docker-compose -f tests/docker-compose.yml run --rm odoo odoo --init=all --test-enable --stop-after-init
