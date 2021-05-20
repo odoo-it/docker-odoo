@@ -25,7 +25,7 @@ if os.path.isdir(ODOO_SOURCE_PATH):
     if not "/home/odoo/src/odoo" in pip_list:
         _logger.info("Installing odoo package..")
         subprocess.check_call([
-            "pip", "install", "--no-cache-dir", "--no-deps", "--editable", ODOO_SOURCE_PATH
+            "pip", "install", "--user", "--no-cache-dir", "--no-deps", "--editable", ODOO_SOURCE_PATH
         ])
     # Make versions 7.0 to 9.0 have an `odoo` executable
     if not os.path.exists("/usr/local/bin/odoo"):
