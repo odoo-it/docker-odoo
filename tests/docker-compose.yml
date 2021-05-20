@@ -17,6 +17,8 @@ services:
                 DOCKER_REPO: $DOCKER_REPO
                 DOCKER_TAG: $DOCKER_TAG
         environment:
+            PYTHONOPTIMIZE:
+            UNACCENT:
             PGDATABASE: testdb
             WITHOUT_DEMO:
         depends_on:
