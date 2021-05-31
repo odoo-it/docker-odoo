@@ -15,15 +15,23 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        odoo_version:
-          - "master"
-          - "14.0"
-          - "13.0"
-          - "12.0"
-          - "11.0"
-          - "10.0"
-          - "9.0"
-          - "8.0"
+        include:
+          - odoo_version: "master"
+            ci_test: false
+          - odoo_version: "14.0"
+            ci_test: true
+          - odoo_version: "13.0"
+            ci_test: true
+          - odoo_version: "12.0"
+            ci_test: false
+          - odoo_version: "11.0"
+            ci_test: false
+          - odoo_version: "10.0"
+            ci_test: false
+          - odoo_version: "9.0"
+            ci_test: false
+          - odoo_version: "8.0"
+            ci_test: false
 
     env:
       DOCKER_REPO: odoo-it/docker-odoo
@@ -31,24 +39,47 @@ jobs:
       GIT_SHA1: ${{ github.sha }}
       RELEASE: ${{ github.event.release.tag_name }}
       # Config
-      DOCKER_BUILDKIT: 1
-      CI_TEST: 0
+      CI_TEST: ${{ matrix.ci_test }}
       CI_PUSH: ${{ github.repository == 'odoo-it/docker-odoo' && github.ref == 'refs/heads/master' }}
 
     steps:
-      # Prepare
+        # Prepare
       - name: Checkout
         uses: actions/checkout@v2
-      # Build image
-      - name: Build Image
-        run: hooks/build
-      # Test
+        # Setup Buildx
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v1
+        # Login ghcr.io
+      - name: Login to ghcr.io
+        uses: docker/login-action@v1
+        with:
+          registry: ghcr.io
+          username: ${{ github.repository_owner }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+        # Build image
+      - name: Build image
+        uses: docker/build-push-action@v2
+        with:
+          file: ${{ env.DOCKER_TAG }}.Dockerfile
+          build-args: |
+            GIT_SHA1=${{ env.GIT_SHA1 }}
+            DOCKER_TAG=${{ env.DOCKER_TAG }}
+            DOCKER_REPO=${{ env.DOCKER_REPO }}
+            ODOO_VERSION=${{ env.DOCKER_TAG }}
+          tags: |
+            ${{ env.DOCKER_REPO }}:${{ env.DOCKER_TAG }}
+          labels: |
+            org.opencontainers.image.source=${{ github.event.repository.html_url }}
+          cache-from: type=registry,ref=ghcr.io/${{ env.DOCKER_REPO }}:${{ env.DOCKER_TAG }}
+          cache-to: type=local,dest=/tmp/.buildx-cache
+          load: true
+        # Test
       - name: Run tests
         if: env.CI_TEST == 'true' || env.CI_TEST == '1'
         run: |
           docker-compose -f tests/docker-compose.yml build
           docker-compose -f tests/docker-compose.yml run --rm odoo odoo --init=all --test-enable --stop-after-init
-      # Push to Github Packages
+        # Push to Github Packages
       - name: Push to Github Packages
         if: env.CI_PUSH == 'true'
         run: hooks/push
