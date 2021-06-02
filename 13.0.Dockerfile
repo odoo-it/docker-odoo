@@ -88,6 +88,8 @@ ARG PIP_REQUIREMENTS="\
     simplejson==3.17.0 \
     urllib3==1.24.3 \
     websocket-client~=0.56 \
+    xlrd==1.2.0 \
+    xlsxwriter==1.2.2 \
     mock \
     astor \
     "
