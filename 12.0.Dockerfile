@@ -94,6 +94,8 @@ ARG PIP_REQUIREMENTS="\
     pyinotify==0.9.6 \
     python-stdnum==1.9 \
     websocket-client~=0.56 \
+    xlrd==1.2.0 \
+    xlsxwriter==1.2.2 \
     "
 RUN apt-get update \
     && apt-get install -yqq --no-install-recommends $BUILD_DEPS \
