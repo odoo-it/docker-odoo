@@ -61,6 +61,7 @@ RUN apt-get -qq update \
     # https://medium.com/geekculture/will-you-be-impacted-by-letsencrypt-dst-root-ca-x3-expiration-d54a018df257
     && sed -i 's/mozilla\/DST_Root_CA_X3.crt/!mozilla\/DST_Root_CA_X3.crt/g' /etc/ca-certificates.conf && update-ca-certificates \
     # npm / nodejs
+    && curl -fsSL https://deb.nodesource.com/gpgkey/nodesource.gpg.key | apt-key add - \
     && curl -sL https://deb.nodesource.com/setup_6.x | bash - \
     && apt-get update \
     && apt-get install -yqq --no-install-recommends --force-yes nodejs \
@@ -107,7 +108,7 @@ ARG BUILD_DEPS="\
     bzip2 \
     "
 ARG PIP_REQUIREMENTS="\
-    git+git://github.com/OCA/openupgradelib.git \
+    openupgradelib \
     git-aggregator \
     click-odoo-contrib \
     phonenumbers \
