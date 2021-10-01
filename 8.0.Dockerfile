@@ -57,6 +57,9 @@ ARG APT_TOOL_PACKAGES="\
 RUN apt-get -qq update \
     && apt-get install -yqq --no-install-recommends $APT_REQUIREMENTS \
     && apt-get install -yqq --no-install-recommends $APT_TOOL_PACKAGES \
+    # Fix letsencrypt DST_Root_CA_X3 expired root certificate
+    # https://medium.com/geekculture/will-you-be-impacted-by-letsencrypt-dst-root-ca-x3-expiration-d54a018df257
+    && sed -i 's/mozilla\/DST_Root_CA_X3.crt/!mozilla\/DST_Root_CA_X3.crt/g' /etc/ca-certificates.conf && update-ca-certificates \
     # npm / nodejs
     && curl -sL https://deb.nodesource.com/setup_6.x | bash - \
     && apt-get update \
