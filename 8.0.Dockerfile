@@ -138,12 +138,10 @@ RUN useradd -md /home/odoo -s /bin/false odoo && sync
 
 # Create directory structure
 ENV SOURCES=/home/odoo/src \
-    CUSTOM=/home/odoo/custom \
     RESOURCES=/home/odoo/.resources \
     CONFIG_DIR=/home/odoo/.config \
     DATA_DIR=/home/odoo/data
 RUN mkdir -p $SOURCES/repositories && \
-    mkdir -p $CUSTOM/repositories && \
     mkdir -p $DATA_DIR && \
     mkdir -p $CONFIG_DIR && \
     mkdir -p $RESOURCES && \

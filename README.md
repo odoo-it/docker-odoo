@@ -29,9 +29,7 @@ same. This is the structure:
 
 | Path                      | Description                                                                                                   |
 | ------------------------- | ------------------------------------------------------------------------------------------------------------- |
-| `custom/repositories`     | Repositories cloned here are loaded with higher priority. Usefull for local development.                      |
 | `src/odoo`                | Empty. Path where odoo source code is expected to be.                                                         |
-| `src/enterprise`          | Optional. Path where odoo enteprise source code is expected to be (if required).                              |
 | `src/repositories`        | Optional. Path where your project's addon repositories are expected to be.                                    |
 | `src/user`                | Optional. Path where your project's local source is expected to be. Submodules will be loaded too.            |
 | `data/`                   | Odoo data directory. You usually want to persist it.                                                          |

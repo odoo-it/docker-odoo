@@ -10,8 +10,6 @@ _logger = logging.getLogger(__name__)
 RESOURCES = os.environ.get('RESOURCES')
 SOURCES = os.environ.get('SOURCES')
 REPOSITORIES = os.path.join(SOURCES, 'repositories')
-CUSTOM = os.environ.get('CUSTOM')
-CUSTOM_REPOSITORIES = os.path.join(CUSTOM, 'repositories')
 USER_REPOSITORY = os.path.join(SOURCES, 'user')
 
 addons = [
@@ -27,15 +25,6 @@ else:
 # Handle enterprise
 if os.path.isdir(os.path.join(SOURCES, 'enterprise')):
     addons.insert(0, os.path.join(SOURCES, 'enterprise'))
-
-# Custom repositories, usually mounted for development
-custom_addons = []
-if os.path.isdir(CUSTOM_REPOSITORIES):
-    custom_addons = [
-        os.path.join(CUSTOM_REPOSITORIES, d)
-        for d in sorted(os.listdir(CUSTOM_REPOSITORIES))
-        if os.path.isdir(os.path.join(CUSTOM_REPOSITORIES, d))
-    ]
 
 # Local repository and its submodules
 # Usually the project repository.
@@ -67,7 +56,7 @@ if os.path.isdir(REPOSITORIES):
     ]
 
 # Repo addons are preprended, in case we want to overwrite odoo modules
-addons = custom_addons + user_addons + repo_addons + addons
+addons = user_addons + repo_addons + addons
 
 # Overwrite 10-addons.conf
 _logger.debug('Updating addons_path.. %s' % addons)
