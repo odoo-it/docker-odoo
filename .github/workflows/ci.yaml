@@ -18,6 +18,8 @@ jobs:
         include:
           - odoo_version: "master"
             ci_test: false
+          - odoo_version: "15.0"
+            ci_test: true
           - odoo_version: "14.0"
             ci_test: true
           - odoo_version: "13.0"
