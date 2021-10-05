@@ -9,11 +9,8 @@ Basically, every directory you have to worry about is found inside `/home/odoo`.
 The directory structure is similar to [odoo.sh](odoo.sh), but not exactly the
 same. This is the structure:
 
-    custom/
-        repositories/
     src/
         odoo/
-        enterprise/
         repositories/
         user/
     data/
@@ -81,7 +78,7 @@ The following variables can customize entrypoint behaviour and `odoo.conf`:
 
 ### Entrypoint
 
--   `CUSTOM_CONFIG`: Custom configuration to be added to `odoo.conf`.
+-   `EXTRA_ODOO_CONF`: Extra odoo configuration to be added to `odoo.conf`.
 -   `CUSTOM_REPOSITORIES`: Custom git-aggregator yaml, repositories will be aggregated at runtime.
 -   `CUSTOM_REQUIREMENTS`: Custom pip requirements.txt, to be installed at runtime.
 -   `CUSTOM_ENTRYPOINT`: Custom script to be executed at runtime.
