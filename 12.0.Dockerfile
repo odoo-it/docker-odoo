@@ -82,7 +82,7 @@ ARG BUILD_DEPS="\
     zlib1g-dev \
     "
 ARG PIP_REQUIREMENTS="\
-    git+git://github.com/OCA/openupgradelib.git \
+    openupgradelib \
     git-aggregator \
     click-odoo-contrib \
     phonenumbers \
