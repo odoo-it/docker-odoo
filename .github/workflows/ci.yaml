@@ -61,7 +61,7 @@ jobs:
           load: true
       -
         name: Test
-        if: matrix.test
+        if: matrix.test && github.event_name == 'pull_request'
         env:
           DOCKER_REPO: ${{ github.repository }}
           DOCKER_TAG: ${{ matrix.odoo }}
