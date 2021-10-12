@@ -1,4 +1,4 @@
-version: '2.4'
+version: '3.5'
 services:
 
     db:
@@ -17,9 +17,9 @@ services:
                 DOCKER_REPO: $DOCKER_REPO
                 DOCKER_TAG: $DOCKER_TAG
         environment:
-            PYTHONOPTIMIZE:
-            UNACCENT:
             PGDATABASE: testdb
             WITHOUT_DEMO:
+            UNACCENT:
+            LOG_LEVEL: warn
         depends_on:
             - db
