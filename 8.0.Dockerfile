@@ -7,8 +7,7 @@ ENV GIT_AUTHOR_NAME=docker-odoo \
     LC_ALL=C.UTF-8 \
     NODE_PATH=/usr/local/lib/node_modules:/usr/lib/node_modules \
     PATH="/home/odoo/.local/bin:$PATH" \
-    PIP_NO_CACHE_DIR=1 \
-    PYTHONOPTIMIZE=1
+    PIP_NO_CACHE_DIR=1
 
 # Other requirements and recommendations to run Odoo
 # See https://github.com/$ODOO_SOURCE/blob/$ODOO_VERSION/debian/control
@@ -193,17 +192,5 @@ ENV UNACCENT="$UNACCENT" \
     PGPORT="$PGPORT" \
     ADMIN_PASSWORD="$ADMIN_PASSWORD" \
     ODOO_VERSION="$ODOO_VERSION"
-
-# Metadata
-ARG VCS_REF
-ARG BUILD_DATE
-ARG VERSION
-LABEL \
-    org.label-schema.schema-version="$VERSION" \
-    org.label-schema.vendor="Odoo IT" \
-    org.label-schema.license="Apache-2.0" \
-    org.label-schema.build-date="$BUILD_DATE" \
-    org.label-schema.vcs-ref="$GIT_SHA1" \
-    org.label-schema.vcs-url="https://github.com/odoo-it/docker-odoo"
 
 USER odoo
