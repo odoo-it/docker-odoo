@@ -17,6 +17,14 @@ RESOURCES = os.environ.get("RESOURCES")
 EXTRA_ODOO_CONF = os.environ.get("EXTRA_ODOO_CONF")
 EXTRA_ODOO_CONF_FILENAME = "999-entrypoint.conf"
 
+# Deprecated
+if not EXTRA_ODOO_CONF:
+    EXTRA_ODOO_CONF = os.environ.get("CUSTOM_CONF")
+    if EXTRA_ODOO_CONF:
+        _logger.warning(
+            "IMPORTANT: CUSTOM_CONF has been deprecated. Use EXTRA_ODOO_CONF instead."
+        )
+
 
 if EXTRA_ODOO_CONF:
     _logger.info("Loading extra odoo.conf:\n\n%s" % EXTRA_ODOO_CONF)
