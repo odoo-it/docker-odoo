@@ -76,7 +76,8 @@ jobs:
           file: ${{ matrix.odoo }}.Dockerfile
           build-args: ODOO_VERSION=${{ matrix.odoo }}
           labels: org.opencontainers.image.source=${{ github.event.repository.html_url }}
-          tags: ghcr.io/${{ github.repository }}:${{ matrix.odoo }}
+          tags: |
+            ghcr.io/${{ github.repository }}:${{ matrix.odoo }}-latest
           push: true
       -
         name: Release
@@ -86,5 +87,7 @@ jobs:
           file: ${{ matrix.odoo }}.Dockerfile
           build-args: ODOO_VERSION=${{ matrix.odoo }}
           labels: org.opencontainers.image.source=${{ github.event.repository.html_url }}
-          tags: ghcr.io/${{ github.repository }}:${{ matrix.odoo }}.${{ github.event.release.tag_name }}
+          tags: |
+            ghcr.io/${{ github.repository }}:${{ matrix.odoo }}
+            ghcr.io/${{ github.repository }}:${{ matrix.odoo }}.${{ github.event.release.tag_name }}
           push: true
