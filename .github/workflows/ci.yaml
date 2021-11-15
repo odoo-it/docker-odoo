@@ -28,12 +28,6 @@ jobs:
             test: false
           - odoo: "11.0"
             test: false
-          - odoo: "10.0"
-            test: false
-          - odoo: "9.0"
-            test: false
-          - odoo: "8.0"
-            test: false
 
     steps:
       -
