@@ -12,7 +12,7 @@ ENV GIT_AUTHOR_NAME=docker-odoo \
 # Other requirements and recommendations to run Odoo
 # See https://github.com/$ODOO_SOURCE/blob/$ODOO_VERSION/debian/control
 ARG WKHTMLTOPDF_VERSION=0.12.5
-ARG WKHTMLTOPDF_CHECKSUM='1140b0ab02aa6e17346af2f14ed0de807376de475ba90e1db3975f112fbd20bb'
+ARG WKHTMLTOPDF_CHECKSUM='ea8277df4297afc507c61122f3c349af142f31e5'
 ARG APT_REQUIREMENTS="\
     git \
     curl \
@@ -38,12 +38,12 @@ RUN apt-get -qq update \
     && apt-get install -yqq --no-install-recommends $APT_REQUIREMENTS \
     && apt-get install -yqq --no-install-recommends $APT_TOOL_PACKAGES \
     # wkhtmltopdf
-    && curl -SLo wkhtmltox.deb https://github.com/wkhtmltopdf/wkhtmltopdf/releases/download/${WKHTMLTOPDF_VERSION}/wkhtmltox_${WKHTMLTOPDF_VERSION}-1.stretch_amd64.deb \
-    && echo "${WKHTMLTOPDF_CHECKSUM}  wkhtmltox.deb" | sha256sum -c - \
+    && curl -SLo wkhtmltox.deb https://github.com/wkhtmltopdf/wkhtmltopdf/releases/download/${WKHTMLTOPDF_VERSION}/wkhtmltox_${WKHTMLTOPDF_VERSION}-1.buster_amd64.deb \
+    && echo "${WKHTMLTOPDF_CHECKSUM}  wkhtmltox.deb" | sha1sum -c - \
     && apt-get install -yqq --no-install-recommends ./wkhtmltox.deb \
     && rm -rf wkhtmltox.deb \
     # postgres
-    && echo 'deb http://apt.postgresql.org/pub/repos/apt/ stretch-pgdg main' >> /etc/apt/sources.list.d/postgresql.list \
+    && echo 'deb http://apt.postgresql.org/pub/repos/apt/ buster-pgdg main' >> /etc/apt/sources.list.d/postgresql.list \
     && curl -SL https://www.postgresql.org/media/keys/ACCC4CF8.asc | apt-key add - \
     && apt-get update \
     && apt-get install -yqq --no-install-recommends postgresql-client \
