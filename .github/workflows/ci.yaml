@@ -7,6 +7,8 @@ on:
       - master
   release:
     types: [created]
+  schedule:
+    - cron: "0 8 * * 5"
 
 jobs:
 
