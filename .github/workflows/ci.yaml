@@ -76,6 +76,8 @@ jobs:
           labels: org.opencontainers.image.source=${{ github.event.repository.html_url }}
           tags: |
             ghcr.io/${{ github.repository }}:${{ matrix.odoo }}-latest
+          cache-from: type=local,src=/tmp/.buildx-cache
+          cache-to: type=inline
           push: true
       -
         name: Release
