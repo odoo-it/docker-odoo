@@ -1,3 +1,5 @@
+[![ci](https://github.com/odoo-it/docker-odoo/actions/workflows/ci.yaml/badge.svg?branch=master&event=push)](https://github.com/odoo-it/docker-odoo/actions/workflows/ci.yaml)
+
 # Docker Odoo
 
 A docker image ready to run Odoo, either for dev or prod deployments, that doesn't
