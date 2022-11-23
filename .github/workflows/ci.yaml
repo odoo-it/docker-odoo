@@ -20,12 +20,14 @@ jobs:
         include:
           - odoo: "master"
             test: false
+          - odoo: "16.0"
+            test: true
           - odoo: "15.0"
             test: true
           - odoo: "14.0"
             test: true
           - odoo: "13.0"
-            test: true
+            test: false
           - odoo: "12.0"
             test: false
           - odoo: "11.0"
