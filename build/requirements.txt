@@ -1,0 +1,8 @@
+# For our tooling
+click-odoo-contrib
+# for odoo tests
+websocket-client
+# required for odoo 14 and 15, but also tests
+mock
+# nice to have
+openupgradelib

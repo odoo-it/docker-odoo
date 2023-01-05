@@ -1,0 +1,10 @@
+services:
+  odoo:
+    image: docker-odoo:master
+    build:
+      context: .
+      args:
+        ODOO_VERSION: master
+        DISTRIBUTION: bullseye
+        PYTHON_VERSION: "3.10"
+        WKHTMLTOPDF_VERSION: "0.12.5"

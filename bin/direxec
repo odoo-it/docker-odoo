@@ -3,7 +3,6 @@
 
 import os
 import subprocess
-import sys
 import logging
 logger = logging.getLogger(__name__)
 
@@ -27,4 +26,7 @@ for executable, folder in sorted(files):
         continue
     if os.access(command, os.X_OK):
         logger.info("Executing %s", command)
-        subprocess.check_call(command)
+        try:
+            subprocess.check_call(command)
+        except Exception as e:
+            logger.error(e)

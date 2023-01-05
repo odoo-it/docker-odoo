@@ -27,7 +27,21 @@ TARGET_FILE = os.environ.get("ODOO_RC", os.environ.get("OPENERP_SERVER"))
 CONFIG_DIR = os.path.join(os.environ.get("RESOURCES"), "conf.d")
 CONFIG_FILES = []
 
-# Read all configuraiton files found in those folders
+# Default configuration values (when missing)
+DEFAULTS = {
+    "UNACCENT": "true",
+    "PROXY_MODE": "true",
+    "WITHOUT_DEMO": "all",
+    "PGUSER": "odoo",
+    "PGPASSWORD": "odoo",
+    "PGHOST": "db",
+    "PGPORT": "5432",
+    "ADMIN_PASSWORD": "admin",
+}
+
+ENVIRON_WITH_DEFAULTS = dict(DEFAULTS, **os.environ)
+
+# Read all configuration files found in those folders
 _logger.info("Merging found configuration files in %s", TARGET_FILE)
 for file in sorted(os.listdir(CONFIG_DIR)):
     parser.read(os.path.join(CONFIG_DIR, file))
@@ -37,21 +51,15 @@ with closing(StringIO()) as resultfp:
     parser.write(resultfp)
     resultfp.seek(0)
     # Process line by line
-    # We'll skip lines with errores
     result = []
     for line in resultfp:
         line = line.strip()
+        # Try to expand variables, skip line if missing
         try:
-            # Try to expand variables
-            line = Template(line).substitute(os.environ)
+            line = Template(line).substitute(ENVIRON_WITH_DEFAULTS)
         except KeyError as e:
-            # If error, simply ignore this line
-            _logger.debug('Skipping config line: %s (missing env)' % (line))
             continue
         result.append(line)
-    # Merge config file
-    result = '\n'.join(result)
-    _logger.debug("Resulting configuration:\n%s", result)
     # Write it to destination
-    with open(TARGET_FILE, "w") as targetfp:
-        targetfp.write(result)
+    with open(TARGET_FILE, "w+") as targetfp:
+        targetfp.write('\n'.join(result))
