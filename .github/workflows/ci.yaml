@@ -18,20 +18,42 @@ jobs:
       fail-fast: false
       matrix:
         include:
+
           - odoo: "master"
-            test: false
+            py:   "3.10"
+            dist: "bullseye"
+            wkhtmltopdf_version: "0.12.5"
+            test: true
+
           - odoo: "16.0"
+            py:   "3.10"
+            dist: "bullseye"
+            wkhtmltopdf_version: "0.12.5"
             test: true
+
           - odoo: "15.0"
+            py:   "3.8"
+            dist: "bullseye"
+            wkhtmltopdf_version: "0.12.5"
             test: true
+
           - odoo: "14.0"
+            py:   "3.8"
+            dist: "buster"
+            wkhtmltopdf_version: "0.12.5"
             test: true
+
           - odoo: "13.0"
-            test: false
+            py:   "3.6"
+            dist: "buster"
+            wkhtmltopdf_version: "0.12.5"
+            test: true
+
           - odoo: "12.0"
-            test: false
-          - odoo: "11.0"
-            test: false
+            py:   "3.6"
+            dist: "buster"
+            wkhtmltopdf_version: "0.12.5"
+            test: true
 
     steps:
       -
@@ -51,8 +73,12 @@ jobs:
         name: Build
         uses: docker/build-push-action@v2
         with:
-          file: ${{ matrix.odoo }}.Dockerfile
-          build-args: ODOO_VERSION=${{ matrix.odoo }}
+          file: Dockerfile
+          build-args: |
+            ODOO_VERSION=${{ matrix.odoo }}
+            DISTRIBUTION=${{ matrix.dist }}
+            PYTHON_VERSION=${{ matrix.py }}
+            WKHTMLTOPDF_VERSION=${{ matrix.wkhtmltopdf_version }}
           tags: ${{ github.repository }}:${{ matrix.odoo }}
           cache-from: type=registry,ref=ghcr.io/${{ github.repository }}:${{ matrix.odoo }}
           cache-to: type=local,dest=/tmp/.buildx-cache
@@ -64,30 +90,26 @@ jobs:
           DOCKER_REPO: ${{ github.repository }}
           DOCKER_TAG: ${{ matrix.odoo }}
         run: |
-          docker-compose -f tests/docker-compose.yml build
-          docker-compose -f tests/docker-compose.yml run --rm odoo odoo --init=all --test-enable --stop-after-init
+          docker-compose -f tests/compose.yaml build
+          docker-compose -f tests/compose.yaml run --rm odoo odoo -i base --stop-after-init
       -
         name: Push
         if: github.ref == 'refs/heads/master'
-        uses: docker/build-push-action@v2
-        with:
-          file: ${{ matrix.odoo }}.Dockerfile
-          build-args: ODOO_VERSION=${{ matrix.odoo }}
-          labels: org.opencontainers.image.source=${{ github.event.repository.html_url }}
-          tags: |
-            ghcr.io/${{ github.repository }}:${{ matrix.odoo }}-latest
-          cache-from: type=local,src=/tmp/.buildx-cache
-          cache-to: type=inline
-          push: true
+        env:
+          DOCKER_REPO: ${{ github.repository }}
+          DOCKER_TAG: ${{ matrix.odoo }}
+        run: |
+          docker tag $DOCKER_REPO:$DOCKER_TAG ghcr.io/$DOCKER_REPO:$DOCKER_TAG-latest
+          docker push ghcr.io/$DOCKER_REPO:$DOCKER_TAG-latest
       -
         name: Release
         if: github.event.release.tag_name
-        uses: docker/build-push-action@v2
-        with:
-          file: ${{ matrix.odoo }}.Dockerfile
-          build-args: ODOO_VERSION=${{ matrix.odoo }}
-          labels: org.opencontainers.image.source=${{ github.event.repository.html_url }}
-          tags: |
-            ghcr.io/${{ github.repository }}:${{ matrix.odoo }}
-            ghcr.io/${{ github.repository }}:${{ matrix.odoo }}.${{ github.event.release.tag_name }}
-          push: true
+        env:
+          DOCKER_REPO: ${{ github.repository }}
+          DOCKER_TAG: ${{ matrix.odoo }}
+          RELEASE: ${{ github.event.release.tag_name }}
+        run: |
+          docker tag $DOCKER_REPO:$DOCKER_TAG ghcr.io/$DOCKER_REPO:$DOCKER_TAG
+          docker tag $DOCKER_REPO:$DOCKER_TAG ghcr.io/$DOCKER_REPO:$DOCKER_TAG.$RELEASE
+          docker push ghcr.io/$DOCKER_REPO:$DOCKER_TAG
+          docker push ghcr.io/$DOCKER_REPO:$DOCKER_TAG.$RELEASE

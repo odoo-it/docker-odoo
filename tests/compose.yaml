@@ -1,0 +1,23 @@
+services:
+  db:
+    image: postgres:12
+    environment:
+      POSTGRES_USER: odoo
+      POSTGRES_PASSWORD: odoo
+      POSTGRES_DB: postgres
+  odoo:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        DOCKER_REPO: ${DOCKER_REPO:-docker-odoo}
+        DOCKER_TAG: ${DOCKER_TAG:-master}
+    environment:
+      PGHOST: db
+      PGDATABASE: testdb
+      WITHOUT_DEMO: "false"
+      UNACCENT: "false"
+      PROXY_MODE: "false"
+      WORKERS: "0"
+    depends_on:
+      - db

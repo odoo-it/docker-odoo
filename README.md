@@ -22,7 +22,6 @@ same. This is the structure:
     .config/
         odoo.conf
     .resources/
-        build.d/
         conf.d/
         entrypoint.d/
 
@@ -81,7 +80,6 @@ The following variables can customize entrypoint behaviour and `odoo.conf`:
 ### Entrypoint
 
 -   `EXTRA_ODOO_CONF`: Extra odoo configuration to be added to `odoo.conf`.
--   `CUSTOM_REPOSITORIES`: Custom git-aggregator yaml, repositories will be aggregated at runtime.
 -   `CUSTOM_REQUIREMENTS`: Custom pip requirements.txt, to be installed at runtime.
 -   `CUSTOM_ENTRYPOINT`: Custom script to be executed at runtime.
 -   `AUTO_UPDATE_MODULES`: Run `click-odoo-update` to automatically update addons.
