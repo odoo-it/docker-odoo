@@ -48,7 +48,6 @@ The following variables can customize entrypoint behaviour and `odoo.conf`:
 -   `PGDATABASE`
 -   `PGUSER`
 -   `PGPASSWORD`
--   `PROXY_MODE`
 
 #### SMTP
 
@@ -72,21 +71,15 @@ The following variables can customize entrypoint behaviour and `odoo.conf`:
 
 #### Other
 
--   `UNACCENT`
 -   `ADMIN_PASSWORD`
+-   `PROXY_MODE`
+-   `UNACCENT`
 -   `LOG_LEVEL`
 -   `SERVER_WIDE_MODULES`
 
 ### Entrypoint
 
--   `EXTRA_ODOO_CONF`: Extra odoo configuration to be added to `odoo.conf`.
+-   `ODOO_CONF`: Extra odoo configuration to be added to `odoo.conf`.
 -   `CUSTOM_REQUIREMENTS`: Custom pip requirements.txt, to be installed at runtime.
 -   `CUSTOM_ENTRYPOINT`: Custom script to be executed at runtime.
 -   `AUTO_UPDATE_MODULES`: Run `click-odoo-update` to automatically update addons.
-
-## Configuration
-
-The following build arguments are available to customize some behaviours:
-
--   `ODOO_SOURCE` (default: `odoo/odoo`)
--   `ODOO_VERSION` (default: `$DOCKER_TAG`)
