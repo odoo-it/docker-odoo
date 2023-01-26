@@ -32,10 +32,6 @@ DEFAULTS = {
     "UNACCENT": "true",
     "PROXY_MODE": "true",
     "WITHOUT_DEMO": "all",
-    "PGUSER": "odoo",
-    "PGPASSWORD": "odoo",
-    "PGHOST": "db",
-    "PGPORT": "5432",
     "ADMIN_PASSWORD": "admin",
 }
 
