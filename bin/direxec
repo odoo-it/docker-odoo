@@ -3,6 +3,7 @@
 
 import os
 import subprocess
+import sys
 import logging
 logger = logging.getLogger(__name__)
 
@@ -29,4 +30,4 @@ for executable, folder in sorted(files):
         try:
             subprocess.check_call(command)
         except Exception as e:
-            logger.error(e)
+            sys.exit(str(e))
