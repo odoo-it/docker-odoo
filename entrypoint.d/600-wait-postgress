@@ -6,7 +6,10 @@ if [ ${WAIT_PG:-true} == "true" ]; then
         echo "ERROR: PGHOST is not defined" 1>&2
         exit 1
     fi
-
+    if [ -z "$PGUSER" ]; then
+        echo "ERROR: PGUSER is not defined" 1>&2
+        exit 1
+    fi
     echo "Waiting for postgres to be ready..."
-    pg_isready --username $PGUSER --host $PGHOST
+    pg_isready
 fi
