@@ -69,6 +69,11 @@ COPY --chown=odoo.odoo --chmod=777 entrypoint.d $RESOURCES/entrypoint.d
 COPY --chown=odoo.odoo --chmod=777 entrypoint.sh $RESOURCES/entrypoint.sh
 RUN ln /usr/local/bin/direxec $RESOURCES/entrypoint
 
+# Default values for postgres
+ENV PGHOST              db
+ENV PGUSER              odoo
+ENV PGPASSWORD          odoo
+
 # Docker
 EXPOSE 8069 8072
 VOLUME "/home/odoo/data"
