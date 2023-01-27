@@ -71,7 +71,7 @@ jobs:
           password: ${{ secrets.GITHUB_TOKEN }}
       -
         name: Build
-        uses: docker/build-push-action@v2
+        uses: docker/build-push-action@v3
         with:
           file: Dockerfile
           build-args: |
@@ -80,7 +80,8 @@ jobs:
             PYTHON_VERSION=${{ matrix.py }}
             WKHTMLTOPDF_VERSION=${{ matrix.wkhtmltopdf_version }}
           tags: ${{ github.repository }}:${{ matrix.odoo }}
-          cache-from: type=registry,ref=ghcr.io/${{ github.repository }}:${{ matrix.odoo }}
+          labels: org.opencontainers.image.source=${{ github.event.repository.html_url }}
+          cache-from: type=registry,ref=ghcr.io/${{ github.repository }}:${{ matrix.odoo }}-latest
           cache-to: type=local,dest=/tmp/.buildx-cache
           load: true
       -
@@ -95,12 +96,18 @@ jobs:
       -
         name: Push
         if: github.ref == 'refs/heads/master'
-        env:
-          DOCKER_REPO: ${{ github.repository }}
-          DOCKER_TAG: ${{ matrix.odoo }}
-        run: |
-          docker tag $DOCKER_REPO:$DOCKER_TAG ghcr.io/$DOCKER_REPO:$DOCKER_TAG-latest
-          docker push ghcr.io/$DOCKER_REPO:$DOCKER_TAG-latest
+        uses: docker/build-push-action@v3
+        with:
+          build-args: |
+            ODOO_VERSION=${{ matrix.odoo }}
+            DISTRIBUTION=${{ matrix.dist }}
+            PYTHON_VERSION=${{ matrix.py }}
+            WKHTMLTOPDF_VERSION=${{ matrix.wkhtmltopdf_version }}
+          tags: ${{ github.repository }}:${{ matrix.odoo }}
+          labels: org.opencontainers.image.source=${{ github.event.repository.html_url }}
+          cache-from: type=local,src=/tmp/.buildx-cache
+          cache-to: type=inline
+          push: true
       -
         name: Release
         if: github.event.release.tag_name
