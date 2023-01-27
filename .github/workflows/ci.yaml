@@ -103,7 +103,7 @@ jobs:
             DISTRIBUTION=${{ matrix.dist }}
             PYTHON_VERSION=${{ matrix.py }}
             WKHTMLTOPDF_VERSION=${{ matrix.wkhtmltopdf_version }}
-          tags: ${{ github.repository }}:${{ matrix.odoo }}
+          tags: ${{ github.repository }}:${{ matrix.odoo }}-latest
           labels: org.opencontainers.image.source=${{ github.event.repository.html_url }}
           cache-from: type=local,src=/tmp/.buildx-cache
           cache-to: type=inline
