@@ -67,7 +67,6 @@ COPY --chmod=777 bin/* /usr/local/bin/
 COPY --chown=odoo.odoo --chmod=777 conf.d $RESOURCES/conf.d
 COPY --chown=odoo.odoo --chmod=777 entrypoint.d $RESOURCES/entrypoint.d
 COPY --chown=odoo.odoo --chmod=777 entrypoint.sh $RESOURCES/entrypoint.sh
-RUN ln /usr/local/bin/direxec $RESOURCES/entrypoint
 
 # Default values for postgres
 ENV PGHOST              db

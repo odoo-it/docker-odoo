@@ -2,7 +2,7 @@
 set -e
 
 echo "Preparing environment..."
-$RESOURCES/entrypoint
+run-parts --exit-on-error --report $RESOURCES/entrypoint.d
 
 echo "Running command: $@"
 case "$1" in
