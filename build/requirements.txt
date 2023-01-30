@@ -1,6 +1,5 @@
 # For our tooling
 click-odoo-contrib
-pyyaml
 # for odoo tests
 websocket-client
 # required for odoo 14 and 15, but also tests
