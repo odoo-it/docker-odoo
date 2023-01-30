@@ -103,7 +103,7 @@ jobs:
             DISTRIBUTION=${{ matrix.dist }}
             PYTHON_VERSION=${{ matrix.py }}
             WKHTMLTOPDF_VERSION=${{ matrix.wkhtmltopdf_version }}
-          tags: ${{ github.repository }}:${{ matrix.odoo }}-latest
+          tags: ghcr.io/${{ github.repository }}:${{ matrix.odoo }}-latest
           labels: org.opencontainers.image.source=${{ github.event.repository.html_url }}
           cache-from: type=local,src=/tmp/.buildx-cache
           cache-to: type=inline
@@ -111,12 +111,17 @@ jobs:
       -
         name: Release
         if: github.event.release.tag_name
-        env:
-          DOCKER_REPO: ${{ github.repository }}
-          DOCKER_TAG: ${{ matrix.odoo }}
-          RELEASE: ${{ github.event.release.tag_name }}
-        run: |
-          docker tag $DOCKER_REPO:$DOCKER_TAG ghcr.io/$DOCKER_REPO:$DOCKER_TAG
-          docker tag $DOCKER_REPO:$DOCKER_TAG ghcr.io/$DOCKER_REPO:$DOCKER_TAG.$RELEASE
-          docker push ghcr.io/$DOCKER_REPO:$DOCKER_TAG
-          docker push ghcr.io/$DOCKER_REPO:$DOCKER_TAG.$RELEASE
+        uses: docker/build-push-action@v3
+        with:
+          build-args: |
+            ODOO_VERSION=${{ matrix.odoo }}
+            DISTRIBUTION=${{ matrix.dist }}
+            PYTHON_VERSION=${{ matrix.py }}
+            WKHTMLTOPDF_VERSION=${{ matrix.wkhtmltopdf_version }}
+          tags: |
+            ghcr.io/${{ github.repository }}:${{ matrix.odoo }}
+            ghcr.io/${{ github.repository }}:${{ matrix.odoo }}.${{ github.event.release.tag_name }}
+          labels: org.opencontainers.image.source=${{ github.event.repository.html_url }}
+          cache-from: type=local,src=/tmp/.buildx-cache
+          cache-to: type=inline
+          push: true
