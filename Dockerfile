@@ -3,12 +3,13 @@ ARG DISTRIBUTION
 FROM python:$PYTHON_VERSION-slim-$DISTRIBUTION
 
 # System environment variables
-ENV GIT_AUTHOR_NAME     odoo
-ENV GIT_COMMITTER_NAME  odoo
-ENV EMAIL               odoo@localhost
-ENV LC_ALL              C.UTF-8
-ENV PIP_NO_CACHE_DIR    1
-ENV PATH                /home/odoo/.local/bin:$PATH
+ENV PATH                            /home/odoo/.local/bin:$PATH
+ENV LC_ALL                          C.UTF-8
+ENV GIT_AUTHOR_NAME                 odoo
+ENV GIT_COMMITTER_NAME              odoo
+ENV EMAIL                           odoo@localhost
+ENV PIP_NO_CACHE_DIR                1
+ENV PIP_DISABLE_PIP_VERSION_CHECK   1
 
 # Very likely, this layer is shared among builds of same distribution
 ARG PYTHON_VERSION
