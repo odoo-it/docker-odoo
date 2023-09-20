@@ -54,6 +54,12 @@ jobs:
             dist: "buster"
             wkhtmltopdf_version: "0.12.5"
             test: true
+    env:
+      BUILD_ARGS: |
+        ODOO_VERSION=${{ matrix.odoo }}
+        DISTRIBUTION=${{ matrix.dist }}
+        PYTHON_VERSION=${{ matrix.py }}
+        WKHTMLTOPDF_VERSION=${{ matrix.wkhtmltopdf_version }}
 
     steps:
       -
@@ -73,11 +79,7 @@ jobs:
         name: Build
         uses: docker/build-push-action@v5
         with:
-          build-args: |
-            ODOO_VERSION=${{ matrix.odoo }}
-            DISTRIBUTION=${{ matrix.dist }}
-            PYTHON_VERSION=${{ matrix.py }}
-            WKHTMLTOPDF_VERSION=${{ matrix.wkhtmltopdf_version }}
+          build-args: ${{ env.BUILD_ARGS }}
           tags: ${{ github.repository }}:${{ matrix.odoo }}
           labels: org.opencontainers.image.source=${{ github.event.repository.html_url }}
           cache-from: type=gha
@@ -97,11 +99,7 @@ jobs:
         if: github.ref == 'refs/heads/master'
         uses: docker/build-push-action@v5
         with:
-          build-args: |
-            ODOO_VERSION=${{ matrix.odoo }}
-            DISTRIBUTION=${{ matrix.dist }}
-            PYTHON_VERSION=${{ matrix.py }}
-            WKHTMLTOPDF_VERSION=${{ matrix.wkhtmltopdf_version }}
+          build-args: ${{ env.BUILD_ARGS }}
           tags: ghcr.io/${{ github.repository }}:${{ matrix.odoo }}-latest
           labels: org.opencontainers.image.source=${{ github.event.repository.html_url }}
           cache-from: type=gha
@@ -112,11 +110,7 @@ jobs:
         if: github.event.release.tag_name
         uses: docker/build-push-action@v5
         with:
-          build-args: |
-            ODOO_VERSION=${{ matrix.odoo }}
-            DISTRIBUTION=${{ matrix.dist }}
-            PYTHON_VERSION=${{ matrix.py }}
-            WKHTMLTOPDF_VERSION=${{ matrix.wkhtmltopdf_version }}
+          build-args: ${{ env.BUILD_ARGS }}
           tags: |
             ghcr.io/${{ github.repository }}:${{ matrix.odoo }}
             ghcr.io/${{ github.repository }}:${{ matrix.odoo }}.${{ github.event.release.tag_name }}
