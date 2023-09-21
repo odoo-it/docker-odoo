@@ -83,4 +83,4 @@ The following variables can customize entrypoint behaviour and `odoo.conf`:
 -   `CUSTOM_REQUIREMENTS`: Custom pip requirements.txt, to be installed at runtime.
 -   `CUSTOM_ENTRYPOINT`: Custom script to be executed at runtime.
 -   `AUTO_UPDATE_MODULES`: Run `click-odoo-update` to automatically update addons.
--   `PG_WAIT_TIMEOUT`: Seconds to wait for the postgres server to respond. Set to `0` to disable. (default: `10`)
+-   `PGTIMEOUT`: Seconds to wait for the postgres server to respond. Set to `0` to disable. (default: `10`)

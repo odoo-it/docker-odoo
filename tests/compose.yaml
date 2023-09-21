@@ -22,7 +22,7 @@ services:
       PGUSER: odoo
       PGPASSWORD: odoo
       PGDATABASE: testdb
-      PG_WAIT_TIMEOUT: 30
+      PGTIMEOUT: 30
       WITHOUT_DEMO: "false"
       UNACCENT: "false"
       PROXY_MODE: "false"
