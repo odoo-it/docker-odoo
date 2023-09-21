@@ -82,8 +82,8 @@ jobs:
           build-args: ${{ env.BUILD_ARGS }}
           tags: ${{ github.repository }}:${{ matrix.odoo }}
           labels: org.opencontainers.image.source=${{ github.event.repository.html_url }}
-          cache-from: type=gha
-          cache-to: type=gha,mode=max
+          cache-from: type=gha,scope=ci
+          cache-to: type=gha,mode=max,scope=ci
           load: true
       -
         name: Test
@@ -102,8 +102,8 @@ jobs:
           build-args: ${{ env.BUILD_ARGS }}
           tags: ghcr.io/${{ github.repository }}:${{ matrix.odoo }}-latest
           labels: org.opencontainers.image.source=${{ github.event.repository.html_url }}
-          cache-from: type=gha
-          cache-to: type=gha,mode=max
+          cache-from: type=gha,scope=ci
+          cache-to: type=gha,mode=max,scope=ci
           push: true
       -
         name: Release
@@ -115,6 +115,6 @@ jobs:
             ghcr.io/${{ github.repository }}:${{ matrix.odoo }}
             ghcr.io/${{ github.repository }}:${{ matrix.odoo }}.${{ github.event.release.tag_name }}
           labels: org.opencontainers.image.source=${{ github.event.repository.html_url }}
-          cache-from: type=gha
-          cache-to: type=gha,mode=max
+          cache-from: type=gha,scope=ci
+          cache-to: type=gha,mode=max,scope=ci
           push: true
