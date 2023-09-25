@@ -5,7 +5,69 @@
 A docker image ready to run Odoo, either for dev or prod deployments, that doesn't
 contain odoo.
 
-## Image usage
+## Usage
+
+### Getting started
+
+This image is prepared to run Odoo, but it doesn't include it. You're expected to cook an image for your project and include whatever Odoo fork you want in it. This gives you a lot of freedom to use this image however you want.
+
+As an example, assuming you have a local Odoo fork in `./src` and your project addons repositories in `./reopsitories`, you could create a project image like this:
+
+#### Dockerfile
+
+```Docker
+FROM ghcr.io/odoo-it/docker-odoo:15.0.2.0.3 AS base
+
+# Install project requirements
+USER root
+COPY --chown=odoo:odoo ./requirements.txt $RESOURCES/requirements.txt
+RUN pip install -r $RESOURCES/requirements.txt
+USER odoo
+
+# Copy sources
+COPY --chown=odoo:odoo repositories $SOURCES/repositories
+COPY --chown=odoo:odoo src $SOURCES/user
+RUN ln -s $SOURCES/repositories/odoo/odoo $SOURCES/odoo && pip-install-odoo
+```
+
+#### docker-compose.yaml
+
+```yaml
+services:
+
+  odoo:
+    build:
+      context: .
+    depends_on:
+      - db
+    ports:
+      - "8069:8069"
+      - "8072:8072"
+    tty: true
+    stdin_open: true
+    volumes:
+      - ./repositories:/home/odoo/src/repositories:rw,z
+      - ./src:/home/odoo/src/user:rw,z
+      - filestore:/home/odoo/data
+    environment:
+      PGHOST: db
+      PGDATABASE: odoodb
+
+  db:
+    image: postgres:15
+    environment:
+      POSTGRES_USER: odoo
+      POSTGRES_PASSWORD: odoo
+      POSTGRES_DB: postgres
+    volumes:
+      - db:/var/lib/postgresql/data
+
+volumes:
+  db:
+  filestore:
+```
+
+### Directory structure
 
 Basically, every directory you have to worry about is found inside `/home/odoo`.
 The directory structure is similar to [odoo.sh](odoo.sh), but not exactly the
@@ -35,13 +97,13 @@ same. This is the structure:
 | `.resources/conf.d`       | Files here will be environment-variable-expanded and concatenated in `odoo.conf` in the entrypoint.           |
 | `.resources/entrypoint.d` | Any executables found here will be run when you launch your container.                                        |
 
-## Runtime environment variables
+### Runtime environment variables
 
 The following variables can customize entrypoint behaviour and `odoo.conf`:
 
-### Odoo Configuration
+#### Odoo Configuration
 
-#### Database
+##### Database
 
 -   `PGHOST`
 -   `PGPORT`
@@ -49,7 +111,7 @@ The following variables can customize entrypoint behaviour and `odoo.conf`:
 -   `PGUSER`
 -   `PGPASSWORD`
 
-#### SMTP
+##### SMTP
 
 -   `SMTP_SERVER`
 -   `SMTP_PORT`
@@ -58,7 +120,7 @@ The following variables can customize entrypoint behaviour and `odoo.conf`:
 -   `SMTP_SSL`
 -   `EMAIL_FROM`
 
-#### Performance
+##### Performance
 
 -   `WORKERS`
 -   `MAX_CRON_THREADS`
@@ -69,7 +131,7 @@ The following variables can customize entrypoint behaviour and `odoo.conf`:
 -   `LIMIT_TIME_REAL`
 -   `LIMIT_TIME_REAL_CRON`
 
-#### Other
+##### Other
 
 -   `ADMIN_PASSWORD`
 -   `PROXY_MODE`
@@ -77,7 +139,7 @@ The following variables can customize entrypoint behaviour and `odoo.conf`:
 -   `LOG_LEVEL`
 -   `SERVER_WIDE_MODULES`
 
-### Entrypoint
+#### Entrypoint
 
 -   `ODOO_CONF`: Extra odoo configuration to be added to `odoo.conf`.
 -   `CUSTOM_REQUIREMENTS`: Custom pip requirements.txt, to be installed at runtime.
