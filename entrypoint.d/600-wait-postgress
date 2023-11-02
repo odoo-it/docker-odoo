@@ -13,11 +13,6 @@ if [ -z "$PGHOST" ]; then
     exit 1
 fi
 
-if [ -z "$PGUSER" ]; then
-    echo "ERROR: PGUSER is not defined" 1>&2
-    exit 1
-fi
-
 echo -n "Waiting for PostgreSQL to be ready ..."
 start_time=$(date +%s)
 until pg_isready -t 1 >/dev/null; do

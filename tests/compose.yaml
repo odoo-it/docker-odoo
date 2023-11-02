@@ -6,10 +6,10 @@ services:
       POSTGRES_PASSWORD: odoo
       POSTGRES_DB: postgres
     healthcheck:
-      test: [ "CMD", "pg_isready" ]
-      interval: 10s
-      timeout: 15s
-      retries: 12
+      test: [ "CMD", "pg_isready", "-q", "-h", "localhost" ]
+      interval: 5s
+      timeout: 5s
+      retries: 5
   odoo:
     build:
       context: .
@@ -22,10 +22,10 @@ services:
       PGUSER: odoo
       PGPASSWORD: odoo
       PGDATABASE: testdb
-      PGTIMEOUT: 30
       WITHOUT_DEMO: "false"
       UNACCENT: "false"
       PROXY_MODE: "false"
       WORKERS: "0"
     depends_on:
-      - db
+      db:
+        condition: service_healthy

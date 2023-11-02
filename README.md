@@ -39,7 +39,8 @@ services:
     build:
       context: .
     depends_on:
-      - db
+      db:
+        condition: service_healthy
     ports:
       - "8069:8069"
       - "8072:8072"
@@ -61,6 +62,11 @@ services:
       POSTGRES_DB: postgres
     volumes:
       - db:/var/lib/postgresql/data
+    healthcheck:
+      test: [ "CMD", "pg_isready", "-q", "-h", "localhost" ]
+      interval: 5s
+      timeout: 5s
+      retries: 5
 
 volumes:
   db:
