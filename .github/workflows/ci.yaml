@@ -20,7 +20,13 @@ jobs:
         include:
 
           - odoo: "master"
-            py:   "3.10"
+            py:   "3.11"
+            dist: "bullseye"
+            wkhtmltopdf_version: "0.12.5"
+            test: true
+
+          - odoo: "17.0"
+            py:   "3.11"
             dist: "bullseye"
             wkhtmltopdf_version: "0.12.5"
             test: true
