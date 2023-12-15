@@ -6,5 +6,5 @@ services:
       args:
         ODOO_VERSION: master
         DISTRIBUTION: bullseye
-        PYTHON_VERSION: "3.10"
+        PYTHON_VERSION: "3.11"
         WKHTMLTOPDF_VERSION: "0.12.5"
