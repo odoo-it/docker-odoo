@@ -5,13 +5,27 @@
 A docker image ready to run Odoo, either for dev or prod deployments, that doesn't
 contain odoo.
 
+## Build
+
+This project uses [Bake](https://docs.docker.com/build/bake/) to build the different images.
+
+The build configurations are defined in the `docker-bake.hcl` file.
+
+Here are some useful commands:
+
+| Command | Description |
+| --- | --- |
+| `docker buildx bake` | Build all the images |
+| `docker buildx bake <target>` | Build the specified target (e.g: `17`) |
+| `docker buildx bake --set="*.platform=linux/amd64"` | Build all the images for amd64 arch only |
+
 ## Usage
 
 ### Getting started
 
 This image is prepared to run Odoo, but it doesn't include it. You're expected to cook an image for your project and include whatever Odoo fork you want in it. This gives you a lot of freedom to use this image however you want.
 
-As an example, assuming you have a local Odoo fork in `./src` and your project addons repositories in `./reopsitories`, you could create a project image like this:
+As an example, assuming you have a local Odoo fork in `./src` and your project addons repositories in `./repositories`, you could create a project image like this:
 
 #### Dockerfile
 

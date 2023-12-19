@@ -2,6 +2,10 @@ ARG PYTHON_VERSION
 ARG DISTRIBUTION
 FROM python:$PYTHON_VERSION-slim-$DISTRIBUTION
 
+# Multi-arch builds
+ARG TARGETPLATFORM
+ARG BUILDPLATFORM
+
 # System environment variables
 ENV PATH                            /home/odoo/.local/bin:$PATH
 ENV LC_ALL                          C.UTF-8
