@@ -60,7 +60,7 @@ RUN useradd -md /home/odoo -s /bin/false odoo \
     && mkdir -p $DATA_DIR \
     && mkdir -p $CONFIG_DIR \
     && mkdir -p $RESOURCES \
-    && chown -R odoo.odoo /home/odoo \
+    && chown -R odoo:odoo /home/odoo \
     && sync
 
 # Entrypoint scripts
