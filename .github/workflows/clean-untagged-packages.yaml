@@ -1,0 +1,19 @@
+name: Clean untagged packages
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: "0 8 * * 5"
+
+jobs:
+  clean:
+    runs-on: ubuntu-latest
+    steps:
+      -
+        name: Clean untagged packages
+        uses: actions/delete-package-versions@v4
+        with: 
+          package-name: "docker-odoo"
+          package-type: "container"
+          min-versions-to-keep: 0
+          delete-only-untagged-versions: "true"
