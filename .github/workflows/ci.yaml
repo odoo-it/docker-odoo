@@ -64,14 +64,12 @@ jobs:
         uses: docker/metadata-action@v5
         with:
           images: ghcr.io/${{ github.repository }}
-          flavor: |
-            latest=auto
-            prefix=${{ matrix.odoo }}-
           tags: |
-            type=ref,event=tag
+            type=ref,event=tag,prefix=${{ matrix.odoo }}.
+            type=ref,event=tag,value=${{ matrix.odoo }}
             type=ref,event=pr,prefix=${{ matrix.odoo }}-pr-
             type=sha,prefix=${{ matrix.odoo }}-
-            type=raw,value=unstable,prefix=${{ matrix.odoo }}-,enable={{is_default_branch}}
+            type=raw,value=latest,prefix=${{ matrix.odoo }}-,enable={{is_default_branch}}
       -
         name: Prepare Bake Target
         id: target
