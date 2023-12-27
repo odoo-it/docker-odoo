@@ -66,12 +66,12 @@ jobs:
           images: ghcr.io/${{ github.repository }}
           flavor: |
             latest=auto
-            prefix=${{ matrix.odoo }}.,onlatest=true
+            prefix=${{ matrix.odoo }}-
           tags: |
-            type=ref,event=branch,enable=${{github.ref == 'refs/heads/master' }}
             type=ref,event=tag
             type=ref,event=pr,prefix=${{ matrix.odoo }}-pr-
             type=sha,prefix=${{ matrix.odoo }}-
+            type=raw,value=unstable,prefix=${{ matrix.odoo }}-,enable={{is_default_branch}}
       -
         name: Prepare Bake Target
         id: target
