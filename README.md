@@ -15,9 +15,9 @@ Here are some useful commands:
 
 | Command | Description |
 | --- | --- |
-| `docker buildx bake` | Build all the images |
-| `docker buildx bake <target>` | Build the specified target (e.g: `17`) |
-| `docker buildx bake --set="*.platform=linux/amd64"` | Build all the images for amd64 arch only |
+| `docker buildx bake` | Build the default version |
+| `VERSION=17.0 docker buildx bake` | Build the specified version (e.g: `17.0`, `master`, ...) |
+| `VERSION=17.0 docker buildx bake --set="*.platform=linux/amd64"` | Build for amd64 arch only |
 
 ## Usage
 

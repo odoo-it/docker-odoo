@@ -1,12 +1,29 @@
-
-group "default" {
-  targets = ["master"]
+variable "REGISTRY" {
+    default = "ghcr.io/odoo-it/docker-odoo"
 }
 
-target "docker-metadata-action" {}
+variable "VERSION" {
+    default = "17.0"
+}
+
+function "version2target" {
+    params = [string]
+    result = trimsuffix(string, ".0")
+}
+
+group "default" {
+    targets = ["${version2target(VERSION)}"]
+}
+
+target "_local" {
+    tags = ["${REGISTRY}:${VERSION}"]
+}
+
+target "docker-metadata-action" {
+}
 
 target "_common" {
-    inherits = ["docker-metadata-action"]
+    inherits = ["_local", "docker-metadata-action"]
 }
 
 target "12" {

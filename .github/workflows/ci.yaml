@@ -73,17 +73,14 @@ jobs:
             type=sha,prefix=${{ matrix.odoo }}-,enable={{is_default_branch}}
             type=raw,value=latest,prefix=${{ matrix.odoo }}-,enable={{is_default_branch}}
       -
-        name: Prepare Bake Target
-        id: target
-        run: echo "target=$(echo '${{ matrix.odoo }}' | sed 's/\.0//g')" >> "$GITHUB_OUTPUT"
-      -
         name: Build
         uses: docker/bake-action@v4
+        env:
+          VERSION: ${{ matrix.odoo }}
         with:
           files: |
             docker-bake.hcl
             ${{ steps.meta.outputs.bake-file }}
-          targets: ${{ steps.target.outputs.target }}
           load: true
           set: |
             *.platform=${{ matrix.platform }}
