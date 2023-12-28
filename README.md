@@ -73,6 +73,15 @@ volumes:
   filestore:
 ```
 
+### Versions
+
+| Tag | Description | Example |
+| --- | --- | --- |
+| `<odoo>` | Targets the latest release for this Odoo version | `17.0`, `16.0`, `master` |
+| `<odoo>.<release>` | Targets a specific release for an Odoo version | `17.0.3.0.0` |
+| `<odoo>-latest` | Targets the latest unreleased/unstable version for this Odoo version | `17.0-latest` |
+| `<odoo>-<sha>` | Targets the a specific commit for this Odoo version | `17.0-a1bsz6` |
+
 ### Directory structure
 
 Basically, every directory you have to worry about is found inside `/home/odoo`.
