@@ -5,20 +5,6 @@
 A docker image ready to run Odoo, either for dev or prod deployments, that doesn't
 contain odoo.
 
-## Build
-
-This project uses [Bake](https://docs.docker.com/build/bake/) to build the different images.
-
-The build configurations are defined in the `docker-bake.hcl` file.
-
-Here are some useful commands:
-
-| Command | Description |
-| --- | --- |
-| `docker buildx bake` | Build the default version |
-| `VERSION=17.0 docker buildx bake` | Build the specified version (e.g: `17.0`, `master`, ...) |
-| `VERSION=17.0 docker buildx bake --set="*.platform=linux/amd64"` | Build for amd64 arch only |
-
 ## Usage
 
 ### Getting started
@@ -166,3 +152,19 @@ The following variables can customize entrypoint behaviour and `odoo.conf`:
 -   `CUSTOM_ENTRYPOINT`: Custom script to be executed at runtime.
 -   `AUTO_UPDATE_MODULES`: Run `click-odoo-update` to automatically update addons.
 -   `PGTIMEOUT`: Seconds to wait for the postgres server to respond. Set to `0` to disable. (default: `10`)
+
+## Development
+
+### Build
+
+This project uses [Bake](https://docs.docker.com/build/bake/) to build the different images.
+
+The build configurations are defined in the `docker-bake.hcl` file.
+
+Here are some useful commands:
+
+| Command | Description |
+| --- | --- |
+| `docker buildx bake` | Build the default version |
+| `VERSION=17.0 docker buildx bake` | Build the specified version (e.g: `17.0`, `master`, ...) |
+| `VERSION=17.0 docker buildx bake --set="*.platform=linux/amd64"` | Build for amd64 arch only |
