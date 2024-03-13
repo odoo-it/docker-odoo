@@ -40,6 +40,7 @@ jobs:
 
     env:
       CACHE_KEY: ${{ matrix.odoo }}_${{ matrix.platform }}
+      VERSION: ${{ matrix.odoo }}
 
     steps:
       -
@@ -75,8 +76,6 @@ jobs:
       -
         name: Build
         uses: docker/bake-action@v4
-        env:
-          VERSION: ${{ matrix.odoo }}
         with:
           files: |
             docker-bake.hcl
@@ -94,7 +93,6 @@ jobs:
           files: |
             docker-bake.hcl
             ${{ steps.meta.outputs.bake-file }}
-          targets: ${{ steps.target.outputs.target }}
           set: |
             *.platform=${{ matrix.platform }}
             *.cache-to=type=gha,mode=max,scope=${{ env.CACHE_KEY }}_${{ steps.meta.outputs.version }}
@@ -115,7 +113,6 @@ jobs:
           files: |
             docker-bake.hcl
             ${{ steps.meta.outputs.bake-file }}
-          targets: ${{ steps.target.outputs.target }}
           push: true
           set: |
             *.platform=${{ matrix.platform }}
@@ -129,7 +126,6 @@ jobs:
           files: |
             docker-bake.hcl
             ${{ steps.meta.outputs.bake-file }}
-          targets: ${{ steps.target.outputs.target }}
           push: true
           set: |
             *.platform=${{ matrix.platform }}
