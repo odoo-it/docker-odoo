@@ -12,32 +12,35 @@ on:
 
 jobs:
 
+  prepare:
+    runs-on: ubuntu-latest
+    outputs:
+      matrix: ${{ steps.matrix.outputs.matrix }}
+    steps:
+      -
+        name: Checkout
+        uses: actions/checkout@v4
+      -
+        name: Create Matrix
+        id: matrix
+        run: |
+          DATA=$(docker buildx bake all --print | jq '.target | to_entries[] | {odoo: .value.args.ODOO_VERSION, platform: .value.platforms[]}' | jq -s)
+          echo "matrix<<EOF" >> "$GITHUB_OUTPUT"
+          echo "$DATA" >> "$GITHUB_OUTPUT"
+          echo "EOF" >> "$GITHUB_OUTPUT"
+      -
+        name: Show Matrix
+        run: |
+          echo "${{ steps.matrix.outputs.matrix }}"
+
   build:
     runs-on: ubuntu-latest
+    needs:
+      - prepare
     strategy:
       fail-fast: false
       matrix:
-        odoo:
-          - "master"
-          - "17.0"
-          - "16.0"
-          - "15.0"
-          - "14.0"
-          - "13.0"
-          - "12.0"
-        platform:
-          - "linux/amd64"
-          - "linux/arm64"
-        exclude:
-          - odoo: "12.0"
-            platform: "linux/arm64"
-          - odoo: "13.0"
-            platform: "linux/arm64"
-          - odoo: "14.0"
-            platform: "linux/arm64"
-          - odoo: "15.0"
-            platform: "linux/arm64"
-
+        include: ${{ fromJson(needs.prepare.outputs.matrix) }}
     env:
       CACHE_KEY: ${{ matrix.odoo }}_${{ matrix.platform }}
       VERSION: ${{ matrix.odoo }}
