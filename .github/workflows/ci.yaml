@@ -10,30 +10,43 @@ on:
   schedule:
     - cron: "0 8 * * 5"
 
+
 jobs:
 
   prepare:
+    name: Prepare
     runs-on: ubuntu-latest
     outputs:
       matrix: ${{ steps.matrix.outputs.matrix }}
+      versions: ${{ steps.versions.outputs.versions }}
     steps:
       -
         name: Checkout
         uses: actions/checkout@v4
       -
-        name: Create Matrix
+        name: Prepare Build Matrix
         id: matrix
         run: |
-          DATA=$(docker buildx bake all --print | jq '.target | to_entries[] | {odoo: .value.args.ODOO_VERSION, platform: .value.platforms[]}' | jq -s)
+          DATA=$(docker buildx bake all --print | jq '.target | to_entries[] | {odoo: .value.args.ODOO_VERSION, target: .key, platform: .value.platforms[]}' | jq -s)
           echo "matrix<<EOF" >> "$GITHUB_OUTPUT"
           echo "$DATA" >> "$GITHUB_OUTPUT"
           echo "EOF" >> "$GITHUB_OUTPUT"
       -
-        name: Show Matrix
+        name: Detect Versions
+        id: versions
         run: |
-          echo "${{ steps.matrix.outputs.matrix }}"
+          DATA=$(docker buildx bake all --print | jq '.target | to_entries[] | .value.args.ODOO_VERSION' | jq -s)
+          echo "versions<<EOF" >> "$GITHUB_OUTPUT"
+          echo "$DATA" >> "$GITHUB_OUTPUT"
+          echo "EOF" >> "$GITHUB_OUTPUT"
+      -
+        name: Show
+        run: |
+          echo "matrix = ${{ steps.matrix.outputs.matrix }}"
+          echo "versions = ${{ steps.versions.outputs.versions }}"
 
   build:
+    name: Build ${{ matrix.odoo }} (${{ matrix.platform }})
     runs-on: ubuntu-latest
     needs:
       - prepare
@@ -42,17 +55,128 @@ jobs:
       matrix:
         include: ${{ fromJson(needs.prepare.outputs.matrix) }}
     env:
+      REGISTRY_IMAGE: ghcr.io/${{ github.repository }}
       CACHE_KEY: ${{ matrix.odoo }}_${{ matrix.platform }}
       VERSION: ${{ matrix.odoo }}
-
     steps:
       -
         name: Checkout
         uses: actions/checkout@v4
       -
+        name: Prepare Slug
+        id: slug
+        run: echo "slug=${CACHE_KEY//\//-}" >> "$GITHUB_OUTPUT"
+      -
         name: Set up QEMU
         uses: docker/setup-qemu-action@v3
         if: matrix.platform != 'linux/amd64'
+      -
+        name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+      -
+        name: Login to Github Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+      -
+        name: Docker Metadata
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: ${{ env.REGISTRY_IMAGE }}
+          flavor: |
+            latest=false
+          tags: |
+            type=ref,event=tag,prefix=${{ matrix.odoo }}.
+            type=ref,event=tag,value=${{ matrix.odoo }}
+            type=ref,event=pr,prefix=${{ matrix.odoo }}-pr-
+            type=sha,prefix=${{ matrix.odoo }}-,enable={{is_default_branch}}
+            type=raw,value=latest,prefix=${{ matrix.odoo }}-,enable={{is_default_branch}}
+      -
+        name: Upload Metadata
+        uses: actions/upload-artifact@v4
+        if: matrix.platform == 'linux/amd64'
+        with:
+          name: bake-meta-${{ matrix.odoo }}.hcl
+          path: ${{ steps.meta.outputs.bake-file }}
+          if-no-files-found: error
+          retention-days: 1
+      -
+        name: Build and Push by Digest
+        id: build
+        uses: docker/bake-action@v4
+        with:
+          files: |
+            docker-bake.hcl
+            ${{ steps.meta.outputs.bake-file }}
+          set: |
+            *.platform=${{ matrix.platform }}
+            *.cache-from=type=gha,scope=${{ env.CACHE_KEY }}
+            *.cache-from=type=gha,scope=${{ env.CACHE_KEY }}_${{ steps.meta.outputs.version }}
+            *.cache-to=type=gha,mode=max,scope=${{ env.CACHE_KEY }}_${{ steps.meta.outputs.version }}
+            *.output=type=docker,name=${{ env.REGISTRY_IMAGE }}:${{ steps.meta.outputs.version }}
+            *.output=type=image,"name=${{ env.REGISTRY_IMAGE }}",push-by-digest=true,name-canonical=true,push=true
+            *.tags=
+      -
+        name: Test
+        id: test
+        if: github.event_name == 'pull_request' && matrix.platform == 'linux/amd64'
+        env:
+          DOCKER_REPO: ${{ env.REGISTRY_IMAGE }}
+          DOCKER_TAG: ${{ steps.meta.outputs.version }}
+        run: |
+          docker-compose -f tests/compose.yaml build
+          docker-compose -f tests/compose.yaml run --rm odoo odoo -i base --stop-after-init
+      -
+        name: Export digest
+        id: digest
+        run: |
+          digest=${{ fromJSON(steps.build.outputs.metadata)[matrix.target]['containerimage.digest'] }}
+          mkdir -p /tmp/digests
+          touch "/tmp/digests/${digest#sha256:}"
+          echo "digest=$digest" >> "$GITHUB_OUTPUT"
+          echo "$digest"
+      -
+        name: Upload digest
+        if: github.ref == 'refs/heads/master' || github.event.release.tag_name
+        uses: actions/upload-artifact@v4
+        with:
+          name: digests-${{ steps.slug.outputs.slug }}
+          path: /tmp/digests/*
+          if-no-files-found: error
+          retention-days: 1
+
+  push:
+    name: Merge & Push
+    if: github.ref == 'refs/heads/master' || github.event.release.tag_name
+    runs-on: ubuntu-latest
+    needs:
+      - prepare
+      - build
+    strategy:
+      fail-fast: false
+      matrix:
+        odoo: ${{ fromJson(needs.prepare.outputs.versions) }}
+    env:
+      REGISTRY_IMAGE: ghcr.io/${{ github.repository }}
+    steps:
+      -
+        name: Download Metadata
+        id: meta
+        uses: actions/download-artifact@v4
+        with:
+          name: bake-meta-${{ matrix.odoo }}.hcl
+          path: /tmp/bake-meta.hcl
+      -
+        name: Download digests
+        id: digests
+        uses: actions/download-artifact@v4
+        with:
+          path: /tmp/digests
+          pattern: digests-${{ matrix.odoo }}*
+          merge-multiple: true
       -
         name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
@@ -64,73 +188,19 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
       -
-        name: Docker metadata
-        id: meta
-        uses: docker/metadata-action@v5
-        with:
-          images: ghcr.io/${{ github.repository }}
-          flavor: |
-            latest=false
-          tags: |
-            type=ref,event=tag,prefix=${{ matrix.odoo }}.
-            type=ref,event=tag,value=${{ matrix.odoo }}
-            type=ref,event=pr,prefix=${{ matrix.odoo }}-pr-
-            type=sha,prefix=${{ matrix.odoo }}-,enable={{is_default_branch}}
-            type=raw,value=latest,prefix=${{ matrix.odoo }}-,enable={{is_default_branch}}
-      -
-        name: Build
-        uses: docker/bake-action@v4
-        with:
-          files: |
-            docker-bake.hcl
-            ${{ steps.meta.outputs.bake-file }}
-          load: true
-          set: |
-            *.platform=${{ matrix.platform }}
-            *.cache-from=type=gha,scope=${{ env.CACHE_KEY }}
-            *.cache-from=type=gha,scope=${{ env.CACHE_KEY }}_${{ steps.meta.outputs.version }}
-      -
-        name: Push PR Cache
-        if: github.event_name == 'pull_request'
-        uses: docker/bake-action@v4
-        with:
-          files: |
-            docker-bake.hcl
-            ${{ steps.meta.outputs.bake-file }}
-          set: |
-            *.platform=${{ matrix.platform }}
-            *.cache-to=type=gha,mode=max,scope=${{ env.CACHE_KEY }}_${{ steps.meta.outputs.version }}
-      -
-        name: Test
-        if: github.event_name == 'pull_request' && matrix.platform == 'linux/amd64'
-        env:
-          DOCKER_REPO: ghcr.io/${{ github.repository }}
-          DOCKER_TAG: ${{ steps.meta.outputs.version }}
+        name: Create manifest list and push
+        working-directory: /tmp/digests
         run: |
-          docker-compose -f tests/compose.yaml build
-          docker-compose -f tests/compose.yaml run --rm odoo odoo -i base --stop-after-init
+          docker buildx imagetools create \
+            $( \
+              jq -cr '.target."docker-metadata-action".tags | \
+              map(select(startswith("${{ env.REGISTRY_IMAGE }}")) | \
+              "-t " + .) | \
+              join(" ")' /tmp/bake-meta.hcl\
+            ) \
+            $(printf '${{ env.REGISTRY_IMAGE }}@sha256:%s ' *)          
       -
-        name: Push
-        if: github.ref == 'refs/heads/master'
-        uses: docker/bake-action@v4
-        with:
-          files: |
-            docker-bake.hcl
-            ${{ steps.meta.outputs.bake-file }}
-          push: true
-          set: |
-            *.platform=${{ matrix.platform }}
-            *.cache-from=type=gha,scope=${{ env.CACHE_KEY }}
-            *.cache-to=type=gha,mode=max,scope=${{ env.CACHE_KEY }}
-      -
-        name: Release
-        if: github.event.release.tag_name
-        uses: docker/bake-action@v4
-        with:
-          files: |
-            docker-bake.hcl
-            ${{ steps.meta.outputs.bake-file }}
-          push: true
-          set: |
-            *.platform=${{ matrix.platform }}
-            *.cache-from=type=gha,scope=${{ env.CACHE_KEY }}
+        name: Inspect image
+        run: |
+          docker buildx imagetools inspect \
+            ${{ env.REGISTRY_IMAGE }}:$(jq -r '.target."docker-metadata-action".args.DOCKER_META_VERSION' /tmp/bake-meta.hcl)
