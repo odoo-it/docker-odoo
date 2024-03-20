@@ -196,7 +196,7 @@ jobs:
               jq -cr '.target."docker-metadata-action".tags | \
               map(select(startswith("${{ env.REGISTRY_IMAGE }}")) | \
               "-t " + .) | \
-              join(" ")' /tmp/bake-meta.hcl\
+              join(" ")' /tmp/bake-meta.hcl \
             ) \
             $(printf '${{ env.REGISTRY_IMAGE }}@sha256:%s ' *)          
       -
