@@ -99,7 +99,7 @@ jobs:
         uses: actions/upload-artifact@v4
         if: matrix.platform == 'linux/amd64'
         with:
-          name: bake-meta-${{ matrix.odoo }}.hcl
+          name: bake-meta-${{ matrix.odoo }}
           path: ${{ steps.meta.outputs.bake-file }}
           if-no-files-found: error
           retention-days: 1
@@ -140,7 +140,6 @@ jobs:
           echo "$digest"
       -
         name: Upload digest
-        if: github.ref == 'refs/heads/master' || github.event.release.tag_name
         uses: actions/upload-artifact@v4
         with:
           name: digests-${{ steps.slug.outputs.slug }}
@@ -167,8 +166,8 @@ jobs:
         id: meta
         uses: actions/download-artifact@v4
         with:
-          name: bake-meta-${{ matrix.odoo }}.hcl
-          path: /tmp/bake-meta.hcl
+          name: bake-meta-${{ matrix.odoo }}
+          path: /tmp
       -
         name: Download digests
         id: digests
@@ -191,16 +190,10 @@ jobs:
         name: Create manifest list and push
         working-directory: /tmp/digests
         run: |
-          docker buildx imagetools create \
-            $( \
-              jq -cr '.target."docker-metadata-action".tags | \
-              map(select(startswith("${{ env.REGISTRY_IMAGE }}")) | \
-              "-t " + .) | \
-              join(" ")' /tmp/bake-meta.hcl \
-            ) \
+          docker buildx imagetools create $( jq -cr '.target."docker-metadata-action".tags | map(select(startswith("${{ env.REGISTRY_IMAGE }}")) | "-t " + .) | join(" ")' /tmp/docker-metadata-action-bake.json ) \
             $(printf '${{ env.REGISTRY_IMAGE }}@sha256:%s ' *)          
       -
         name: Inspect image
         run: |
           docker buildx imagetools inspect \
-            ${{ env.REGISTRY_IMAGE }}:$(jq -r '.target."docker-metadata-action".args.DOCKER_META_VERSION' /tmp/bake-meta.hcl)
+            ${{ env.REGISTRY_IMAGE }}:$(jq -r '.target."docker-metadata-action".args.DOCKER_META_VERSION' /tmp/docker-metadata-action-bake.json)
