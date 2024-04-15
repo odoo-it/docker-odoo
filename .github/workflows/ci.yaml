@@ -173,7 +173,7 @@ jobs:
         with:
           files: |
             docker-bake.hcl
-            ${{ steps.meta.outputs.bake-file }}
+            ${{ steps.meta.outputs.bake-file-labels }}
           set: |
             *.platform=${{ matrix.platform }}
             *.cache-from=type=gha,scope=${{ env.CACHE_KEY }}
