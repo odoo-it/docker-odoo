@@ -102,7 +102,7 @@ target "master" {
     args = {
         ODOO_VERSION="master"
         DISTRIBUTION="bookworm"
-        PYTHON_VERSION="3.11"
+        PYTHON_VERSION="3.12"
         WKHTMLTOPDF_VERSION="0.12.6"
     }
 }
