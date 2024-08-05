@@ -30,7 +30,7 @@ COPY --chown=odoo:odoo src $SOURCES/user
 RUN ln -s $SOURCES/repositories/odoo/odoo $SOURCES/odoo && pip-install-odoo
 ```
 
-#### docker-compose.yaml
+#### compose.yaml
 
 ```yaml
 services:

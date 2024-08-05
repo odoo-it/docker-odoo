@@ -117,18 +117,8 @@ jobs:
             *.cache-from=type=gha,scope=${{ env.CACHE_KEY }}_${{ steps.meta.outputs.version }}
             *.cache-to=type=gha,mode=max,scope=${{ env.CACHE_KEY }}_${{ steps.meta.outputs.version }}
             *.output=type=docker,name=${{ env.REGISTRY_IMAGE }}:${{ steps.meta.outputs.version }}
-            *.output=type=image,"name=${{ env.REGISTRY_IMAGE }}",push-by-digest=true,name-canonical=true,push=true
+            *.output=type=image,name=${{ env.REGISTRY_IMAGE }},push-by-digest=true,name-canonical=true,push=true
             *.tags=
-      -
-        name: Test
-        id: test
-        if: github.event_name == 'pull_request' && matrix.platform == 'linux/amd64'
-        env:
-          DOCKER_REPO: ${{ env.REGISTRY_IMAGE }}
-          DOCKER_TAG: ${{ steps.meta.outputs.version }}
-        run: |
-          docker-compose -f tests/compose.yaml build
-          docker-compose -f tests/compose.yaml run --rm odoo odoo -i base --stop-after-init
       -
         name: Export digest
         id: digest
@@ -146,6 +136,17 @@ jobs:
           path: /tmp/digests/*
           if-no-files-found: error
           retention-days: 1
+      -
+        name: Test
+        id: test
+        if: github.event_name == 'pull_request' && matrix.platform == 'linux/amd64'
+        env:
+          DOCKER_BUILDKIT: 0
+          DOCKER_REPO: ${{ env.REGISTRY_IMAGE }}
+          DOCKER_TAG: ${{ steps.meta.outputs.version }}
+        run: |
+          docker compose -f tests/compose.yaml build
+          docker compose -f tests/compose.yaml run --rm odoo odoo -i base --stop-after-init
 
   push:
     name: Merge & Push
