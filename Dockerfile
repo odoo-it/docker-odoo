@@ -55,8 +55,7 @@ ENV RESOURCES           /home/odoo/.resources
 
 # Config env
 ENV ODOO_VERSION        $ODOO_VERSION
-ENV OPENERP_SERVER      $CONFIG_DIR/odoo.conf
-ENV ODOO_RC             $OPENERP_SERVER
+ENV ODOO_RC             $CONFIG_DIR/odoo.conf
 
 # Add odoo user and directories
 RUN useradd -md /home/odoo -s /bin/false odoo \

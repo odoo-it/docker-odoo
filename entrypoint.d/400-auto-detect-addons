@@ -15,12 +15,6 @@ addons = [
     os.path.join(SOURCES, 'odoo', 'addons'),
 ]
 
-# Handle versions <= 9.0, where odoo is called openerp
-if os.environ.get('ODOO_VERSION') in ['6.0', '7.0', '8.0', '9.0']:
-    addons.append(os.path.join(SOURCES, 'odoo', 'openerp', 'addons'))
-else:
-    addons.append(os.path.join(SOURCES, 'odoo', 'odoo', 'addons'))
-
 # Handle enterprise
 if os.path.isdir(os.path.join(SOURCES, 'enterprise')):
     addons.insert(0, os.path.join(SOURCES, 'enterprise'))
