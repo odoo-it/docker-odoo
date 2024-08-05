@@ -106,7 +106,7 @@ jobs:
       -
         name: Build and Push by Digest
         id: build
-        uses: docker/bake-action@v4
+        uses: docker/bake-action@v5
         with:
           files: |
             docker-bake.hcl
