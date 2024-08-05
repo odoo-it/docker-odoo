@@ -6,42 +6,18 @@ import logging
 _logger = logging.getLogger(__name__)
 
 SOURCES = os.environ.get("SOURCES")
-ODOO_VERSION = os.environ.get("ODOO_VERSION")
 ODOO_SOURCE_PATH = os.path.join(SOURCES, "odoo")
 ODOO_EGGINFO_PATH = os.path.join(ODOO_SOURCE_PATH, "odoo.egg-info")
 
-BIN_PATH = "/usr/local/bin"
-USER_BIN_PATH = "/home/odoo/.local/bin"
 
-
-if os.path.isdir(ODOO_SOURCE_PATH):
+if os.path.isdir(ODOO_SOURCE_PATH) and not os.path.exists(ODOO_EGGINFO_PATH):
     # The build runs 'pip install -e' on the odoo src, which creates an
     # odoo.egg-info directory inside src/odoo. So when we run a container
     # with a volume shared with the host, we don't have this .egg-info
     # (at least the first time).
     # When it happens, we reinstall the odoo python package. We don't want to run
     # the install everytime because it would slow the start of the containers
-    pip_list = subprocess.check_output(
-        ["pip", "list", "--format=columns"],
-        universal_newlines=True,
-    )
-    if "/home/odoo/src/odoo" not in pip_list:
-        _logger.info("Installing odoo package..")
-        subprocess.check_call([
-            "pip", "install", "--user", "--no-cache-dir", "--no-deps", "--editable", ODOO_SOURCE_PATH
-        ])
-    # Make versions 7.0 to 9.0 have an `odoo` executable
-    if not any(os.path.exists(os.path.join(path, "odoo")) for path in [BIN_PATH, USER_BIN_PATH]):
-        odoo_bin_name = "odoo"
-        if ODOO_VERSION == "7.0":
-            odoo_bin_name = "openerp-server"
-        elif ODOO_VERSION in ["8.0", "9.0"]:
-            odoo_bin_name = "odoo.py"
-        for path in [BIN_PATH, USER_BIN_PATH]:
-            odoo_bin_path = os.path.join(path, odoo_bin_name)
-            if os.path.exists(odoo_bin_path):
-                target_bin_path = BIN_PATH if os.access(BIN_PATH, os.W_OK) else USER_BIN_PATH
-                target_bin_path = os.path.join(target_bin_path, "odoo")
-                _logger.info("Creating odoo symlink %s --> %s", odoo_bin_path, target_bin_path)
-                os.symlink(odoo_bin_path, target_bin_path)
-                break
+    _logger.info("Installing odoo package..")
+    subprocess.check_call([
+        "pip", "install", "--user", "--no-cache-dir", "--no-deps", "--editable", ODOO_SOURCE_PATH
+    ])

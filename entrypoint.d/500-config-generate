@@ -11,7 +11,7 @@ _logger = logging.getLogger(__name__)
 
 
 ODOO_VERSION = os.environ.get("ODOO_VERSION")
-TARGET_FILE = os.environ.get("ODOO_RC", os.environ.get("OPENERP_SERVER"))
+TARGET_FILE = os.environ.get("ODOO_RC")
 CONFIG_DIR = os.path.join(os.environ.get("RESOURCES"), "conf.d")
 CONFIG_FILES = []
 
