@@ -7,13 +7,13 @@ ARG TARGETPLATFORM
 ARG BUILDPLATFORM
 
 # System environment variables
-ENV PATH                            /home/odoo/.local/bin:$PATH
-ENV LC_ALL                          C.UTF-8
-ENV GIT_AUTHOR_NAME                 odoo
-ENV GIT_COMMITTER_NAME              odoo
-ENV EMAIL                           odoo@localhost
-ENV PIP_NO_CACHE_DIR                1
-ENV PIP_DISABLE_PIP_VERSION_CHECK   1
+ENV PATH=/home/odoo/.local/bin:$PATH
+ENV LC_ALL=C.UTF-8
+ENV GIT_AUTHOR_NAME=odoo
+ENV GIT_COMMITTER_NAME=odoo
+ENV EMAIL=odoo@localhost
+ENV PIP_NO_CACHE_DIR=1
+ENV PIP_DISABLE_PIP_VERSION_CHECK=1
 
 # Very likely, this layer is shared among builds of same distribution
 ARG PYTHON_VERSION
@@ -47,15 +47,15 @@ RUN apt-get -qq update \
     && sync
 
 # Create directory structure
-ENV SOURCES             /home/odoo/src
-ENV REPOSITORIES        $SOURCES/repositories
-ENV DATA_DIR            /home/odoo/data
-ENV CONFIG_DIR          /home/odoo/.config
-ENV RESOURCES           /home/odoo/.resources
+ENV SOURCES=/home/odoo/src
+ENV REPOSITORIES=$SOURCES/repositories
+ENV DATA_DIR=/home/odoo/data
+ENV CONFIG_DIR=/home/odoo/.config
+ENV RESOURCES=/home/odoo/.resources
 
 # Config env
-ENV ODOO_VERSION        $ODOO_VERSION
-ENV ODOO_RC             $CONFIG_DIR/odoo.conf
+ENV ODOO_VERSION=$ODOO_VERSION
+ENV ODOO_RC=$CONFIG_DIR/odoo.conf
 
 # Add odoo user and directories
 RUN useradd -md /home/odoo -s /bin/false odoo \
@@ -73,9 +73,9 @@ COPY --chown=odoo.odoo --chmod=777 entrypoint.d $RESOURCES/entrypoint.d
 COPY --chown=odoo.odoo --chmod=777 entrypoint.sh $RESOURCES/entrypoint.sh
 
 # Default values for postgres
-ENV PGHOST              db
-ENV PGUSER              odoo
-ENV PGPASSWORD          odoo
+ENV PGHOST=db
+ENV PGUSER=odoo
+ENV PGPASSWORD=odoo
 
 # Docker
 EXPOSE 8069 8072
