@@ -82,5 +82,5 @@ EXPOSE 8069 8072
 VOLUME "/home/odoo/data"
 WORKDIR "/home/odoo"
 ENTRYPOINT ["/home/odoo/.resources/entrypoint.sh"]
-CMD "odoo"
+CMD ["odoo"]
 USER odoo
