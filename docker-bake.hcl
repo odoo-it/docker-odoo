@@ -36,7 +36,7 @@ target "12" {
     args = {
         ODOO_VERSION="12.0"
         DISTRIBUTION="buster"
-        PYTHON_VERSION="3.6"
+        PYTHON_VERSION="3.7"
         WKHTMLTOPDF_VERSION="0.12.5"
     }
 }
@@ -47,7 +47,7 @@ target "13" {
     args = {
         ODOO_VERSION="13.0"
         DISTRIBUTION="buster"
-        PYTHON_VERSION="3.6"
+        PYTHON_VERSION="3.7"
         WKHTMLTOPDF_VERSION="0.12.5"
     }
 }
@@ -58,7 +58,7 @@ target "14" {
     args = {
         ODOO_VERSION="14.0"
         DISTRIBUTION="buster"
-        PYTHON_VERSION="3.8"
+        PYTHON_VERSION="3.10"
         WKHTMLTOPDF_VERSION="0.12.5"
     }
 }
@@ -69,7 +69,7 @@ target "15" {
     args = {
         ODOO_VERSION="15.0"
         DISTRIBUTION="bullseye"
-        PYTHON_VERSION="3.8"
+        PYTHON_VERSION="3.12"
         WKHTMLTOPDF_VERSION="0.12.5"
     }
 }
@@ -80,7 +80,7 @@ target "16" {
     args = {
         ODOO_VERSION="16.0"
         DISTRIBUTION="bookworm"
-        PYTHON_VERSION="3.10"
+        PYTHON_VERSION="3.12"
         WKHTMLTOPDF_VERSION="0.12.6"
     }
 }
@@ -91,7 +91,7 @@ target "17" {
     args = {
         ODOO_VERSION="17.0"
         DISTRIBUTION="bookworm"
-        PYTHON_VERSION="3.11"
+        PYTHON_VERSION="3.12"
         WKHTMLTOPDF_VERSION="0.12.6"
     }
 }
