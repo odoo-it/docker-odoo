@@ -39,6 +39,7 @@ RUN apt-get -qq update \
     && pip install --no-cache-dir -r /build/odoo/requirements.txt \
     && pip install --no-cache-dir -r /build/requirements.txt \
     && pip install --no-cache-dir -r /build/extra-requirements.txt \
+    && pip install --no-cache-dir -r /build/test-requirements.txt \
     && (python3 -m compileall -q /usr/local/lib/python3*/ || true) \
     # Cleanup
     && xargs -a /build/install/${DISTRIBUTION}/apt-build-deps.txt apt-get purge -yqq \

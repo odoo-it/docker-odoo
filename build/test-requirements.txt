@@ -1,0 +1,8 @@
+# Optional test dependencies for Odoo
+# These are usually not properly documented, and are considered optional.
+
+# for odoo tests
+websocket-client
+
+# required for odoo 14 and 15, but also tests
+mock
