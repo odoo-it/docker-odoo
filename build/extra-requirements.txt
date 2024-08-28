@@ -1,0 +1,23 @@
+# Optional dependencies for Odoo
+# These are usually not properly documented, and are considered optional
+# but they enable some interesting features or improvements.
+
+# https://github.com/odoo/docker/blob/b6411dfc/17.0/Dockerfile#L25C17-L25C22
+python-magic
+
+# To be able to import ODF/ODS files
+# https://github.com/odoo/docker/blob/b6411dfc/17.0/Dockerfile#L27C17-L27C20
+# https://github.com/odoo/odoo/blob/a854cbc7/addons/base_import/models/base_import.py#L88
+odfpy
+
+# To be able to index PDF files (`attachment_indexation`)
+# https://github.com/odoo/odoo/blob/4ac2702c/addons/attachment_indexation/models/ir_attachment.py#L13-L20
+pdfminer.six
+
+# Phone number verification (e.g.: `phone_validation`, but others too)
+# https://github.com/odoo/odoo/blob/c0db5f08/addons/phone_validation/tools/phone_validation.py#L115-L118
+phonenumbers
+
+# Better slugs
+# https://github.com/odoo/odoo/blob/92bef65c/odoo/addons/base/models/ir_http.py#L23-L27
+python-slugify
