@@ -74,6 +74,9 @@ COPY --chown=odoo.odoo --chmod=777 conf.d $RESOURCES/conf.d
 COPY --chown=odoo.odoo --chmod=777 entrypoint.d $RESOURCES/entrypoint.d
 COPY --chown=odoo.odoo --chmod=777 entrypoint.sh $RESOURCES/entrypoint.sh
 
+# Other files
+COPY --chown=odoo.odoo --chmod=777 other/welcome.sh /etc/profile.d/
+
 # Default values for postgres
 ENV PGHOST=db
 ENV PGUSER=odoo
