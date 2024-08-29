@@ -14,7 +14,7 @@ tput sgr0
 # Print Odoo version and database information
 echo ""
 echo "You are running Odoo $(tput setaf 3)$ODOO_VERSION$(tput sgr0) connected to $(tput setaf 3)$PGDATABASE$(tput sgr0)."
-echo "The configuration file is $(tput setaf 3)$ODOO_RC$(tput sgr0), generated from $(tput setaf 3)$CONFIG_DIR$(tput sgr0)."
+echo "The configuration file is $(tput setaf 3)$ODOO_RC$(tput sgr0), generated from $(tput setaf 3)$RESOURCES/conf.d$(tput sgr0)."
 
 # Print some usefull commands
 echo ""
