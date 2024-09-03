@@ -146,7 +146,7 @@ jobs:
           DOCKER_TAG: ${{ steps.meta.outputs.version }}
         run: |
           docker compose -f tests/compose.yaml build
-          docker compose -f tests/compose.yaml run --rm odoo odoo -i base --stop-after-init
+          docker compose -f tests/compose.yaml run --rm odoo odoo -i mail,contacts --stop-after-init
 
   push:
     name: Merge & Push
