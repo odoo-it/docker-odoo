@@ -36,10 +36,12 @@ COPY --chmod=700 build/ /build/
 RUN apt-get -qq update \
     && xargs -a /build/install/${DISTRIBUTION}/apt-build-deps.txt apt-get install -yqq --no-install-recommends \
     # Python Packages
-    && pip install --no-cache-dir -r /build/odoo/requirements.txt \
-    && pip install --no-cache-dir -r /build/requirements.txt \
-    && pip install --no-cache-dir -r /build/extra-requirements.txt \
-    && pip install --no-cache-dir -r /build/test-requirements.txt \
+    && pip install --no-cache-dir \
+        --requirement /build/odoo/requirements.txt \
+        --requirement /build/requirements.txt \
+        --requirement /build/extra-requirements.txt \
+        --requirement /build/test-requirements.txt \
+        --constraint /build/odoo/requirements.txt \
     && (python3 -m compileall -q /usr/local/lib/python3*/ || true) \
     # Cleanup
     && xargs -a /build/install/${DISTRIBUTION}/apt-build-deps.txt apt-get purge -yqq \
