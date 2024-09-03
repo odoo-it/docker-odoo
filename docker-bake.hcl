@@ -69,7 +69,7 @@ target "15" {
     args = {
         ODOO_VERSION="15.0"
         DISTRIBUTION="bullseye"
-        PYTHON_VERSION="3.12"
+        PYTHON_VERSION="3.10"
         WKHTMLTOPDF_VERSION="0.12.5"
     }
 }
