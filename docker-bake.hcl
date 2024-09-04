@@ -6,6 +6,10 @@ variable "VERSION" {
     default = "17.0"
 }
 
+variable "LOCAL_GEOIP_PATH" {
+    default = "."
+}
+
 function "version2target" {
     params = [string]
     result = trimsuffix(string, ".0")
@@ -28,6 +32,9 @@ target "docker-metadata-action" {
 
 target "_common" {
     inherits = ["_local", "docker-metadata-action"]
+    args = {
+        LOCAL_GEOIP_PATH = LOCAL_GEOIP_PATH
+    }
 }
 
 target "12" {

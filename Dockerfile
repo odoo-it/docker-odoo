@@ -50,6 +50,11 @@ RUN apt-get -qq update \
     && rm -rf /build \
     && sync
 
+# Install GeoIP database (optional)
+# The LOCAL_GEOIP_PATH is used to specify the path to the GeoIP database files
+ARG LOCAL_GEOIP_PATH="."
+COPY ${LOCAL_GEOIP_PATH}/GeoLite2-*.mmdb /usr/share/GeoIP/
+
 # Create directory structure
 ENV SOURCES=/home/odoo/src
 ENV REPOSITORIES=$SOURCES/repositories
