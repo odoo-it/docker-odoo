@@ -45,11 +45,55 @@ jobs:
           echo "matrix = ${{ steps.matrix.outputs.matrix }}"
           echo "versions = ${{ steps.versions.outputs.versions }}"
 
+  download-geoip:
+    name: Download GeoIP databases
+    runs-on: ubuntu-latest
+    env:
+      MAXMIND_USERID: ${{ secrets.MAXMIND_USERID }}
+      MAXMIND_LICENSE_KEY: ${{ secrets.MAXMIND_LICENSE_KEY }}
+    outputs:
+      cache-hit: ${{ steps.geoip-cache.outputs.cache-hit }}
+    steps:
+      -
+        name: Get Date
+        id: get-date
+        shell: bash
+        run: echo "date=$(/bin/date -u "+%Y%m%d")" >> $GITHUB_OUTPUT
+      -
+        name: Check cache
+        id: geoip-cache
+        uses: actions/cache@v4
+        with:
+          path: 'geoip'
+          key: geoip-${{ steps.get-date.outputs.date }}
+          lookup-only: true
+      -
+        name: Download
+        if: steps.geoip-cache.outputs.cache-hit != 'true'
+        run: |
+          mkdir -p geoip && cd geoip
+          # Install GeoIP City database
+          curl -L -u $MAXMIND_USERID:$MAXMIND_LICENSE_KEY "https://download.maxmind.com/geoip/databases/GeoLite2-City/download?suffix=tar.gz" -o /tmp/GeoLite2-City.tar.gz
+          tar -xvzf /tmp/GeoLite2-City.tar.gz --wildcards --no-anchored '*.mmdb' --strip-components=1
+          rm /tmp/GeoLite2-City.tar.gz
+          # Install GeoIP Country database
+          curl -L -u $MAXMIND_USERID:$MAXMIND_LICENSE_KEY "https://download.maxmind.com/geoip/databases/GeoLite2-Country/download?suffix=tar.gz" -o /tmp/GeoLite2-Country.tar.gz
+          tar -xvzf /tmp/GeoLite2-Country.tar.gz --wildcards --no-anchored '*.mmdb' --strip-components=1
+          rm /tmp/GeoLite2-Country.tar.gz
+          # Show the files
+          ls -la
+          # Check if directory contains *.mmdb files and fail if it doesn't
+          if [ -z "$(ls *.mmdb 2>/dev/null)" ]; then
+          echo "Error: No *.mmdb files found in the geoip directory. Download failed or files were not extracted correctly."
+            exit 1
+          fi
+
   build:
     name: Build ${{ matrix.odoo }} (${{ matrix.platform }})
     runs-on: ubuntu-latest
     needs:
       - prepare
+      - download-geoip
     strategy:
       fail-fast: false
       matrix:
@@ -104,9 +148,23 @@ jobs:
           if-no-files-found: error
           retention-days: 1
       -
+        name: Download GeoIP
+        id: geoip
+        uses: actions/cache/restore@v4
+        with:
+          path: 'geoip'
+          key: geoip-
+          restore-keys: geoip-
+          fail-on-cache-miss: true
+      -
+        name: Show GeoIP files
+        run: ls -la geoip
+      -
         name: Build and Push by Digest
         id: build
         uses: docker/bake-action@v5
+        env:
+          LOCAL_GEOIP_PATH: geoip
         with:
           files: |
             docker-bake.hcl

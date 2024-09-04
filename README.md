@@ -177,3 +177,11 @@ Here are some useful commands:
 | `docker buildx bake` | Build the default version |
 | `VERSION=17.0 docker buildx bake` | Build the specified version (e.g: `17.0`, `master`, ...) |
 | `VERSION=17.0 docker buildx bake --set="*.platform=linux/amd64"` | Build for amd64 arch only |
+
+#### GeoIP
+
+To include the GeoIP databases in the image, you can place the `GeoLite2-City.mmdb` and
+`GeoLite2-Country.mmdb` files in the build directory and bake the image.
+
+Alternatively, you can use the `LOCAL_GEOIP_PATH` argument to specify a path to the GeoIP
+databases. However, keep in mind that the path must be relative to the build directory.
