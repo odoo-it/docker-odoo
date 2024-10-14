@@ -3,7 +3,7 @@ variable "REGISTRY" {
 }
 
 variable "VERSION" {
-    default = "17.0"
+    default = "18.0"
 }
 
 variable "LOCAL_GEOIP_PATH" {
@@ -20,7 +20,7 @@ group "default" {
 }
 
 group "all" {
-    targets = ["12", "13", "14", "15", "16", "17", "master"]
+    targets = ["12", "13", "14", "15", "16", "17", "18", "master"]
 }
 
 target "_local" {
@@ -97,6 +97,17 @@ target "17" {
     platforms = ["linux/amd64", "linux/arm64"]
     args = {
         ODOO_VERSION="17.0"
+        DISTRIBUTION="bookworm"
+        PYTHON_VERSION="3.12"
+        WKHTMLTOPDF_VERSION="0.12.6"
+    }
+}
+
+target "18" {
+    inherits = ["_common"]
+    platforms = ["linux/amd64", "linux/arm64"]
+    args = {
+        ODOO_VERSION="18.0"
         DISTRIBUTION="bookworm"
         PYTHON_VERSION="3.12"
         WKHTMLTOPDF_VERSION="0.12.6"
