@@ -87,7 +87,7 @@ target "16" {
     args = {
         ODOO_VERSION="16.0"
         DISTRIBUTION="bookworm"
-        PYTHON_VERSION="3.12"
+        PYTHON_VERSION="3.10"
         WKHTMLTOPDF_VERSION="0.12.6"
     }
 }
