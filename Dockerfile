@@ -12,44 +12,52 @@ ENV LC_ALL=C.UTF-8
 ENV GIT_AUTHOR_NAME=odoo
 ENV GIT_COMMITTER_NAME=odoo
 ENV EMAIL=odoo@localhost
-ENV PIP_NO_CACHE_DIR=1
 ENV PIP_DISABLE_PIP_VERSION_CHECK=1
 
 # Very likely, this layer is shared among builds of same distribution
 ARG PYTHON_VERSION
 ARG DISTRIBUTION
 ARG WKHTMLTOPDF_VERSION
-COPY --chmod=700 build/install/${DISTRIBUTION} /build/install/${DISTRIBUTION}
-RUN apt-get -qq update \
-    && xargs -a /build/install/${DISTRIBUTION}/apt-requirements.txt apt-get install -yqq --no-install-recommends \
-    && /build/install/${DISTRIBUTION}/wkhtmltopdf-${WKHTMLTOPDF_VERSION}.sh \
-    && /build/install/${DISTRIBUTION}/postgres-client.sh \
-    && rm -rf /var/lib/apt/lists/* /tmp/* \
-    && rm -rf /build \
+RUN --mount=type=bind,src=build/install/${DISTRIBUTION},dst=/build/install,rw \
+    --mount=type=cache,target=/var/cache/apt,sharing=locked \
+    --mount=type=cache,target=/var/lib/apt,sharing=locked \
+    apt-get -qq update \
+    && xargs -a /build/install/apt-requirements.txt apt-get install -yqq --no-install-recommends \
+    && chmod +x /build/install/*.sh \
+    && /build/install/wkhtmltopdf-${WKHTMLTOPDF_VERSION}.sh \
+    && /build/install/postgres-client.sh \
+    && rm -rf /tmp/* \
     && sync
 
 # Install and build Odoo dependencies
 ARG ODOO_VERSION=master
 ARG ODOO_SOURCE=odoo/odoo
-ADD https://raw.githubusercontent.com/$ODOO_SOURCE/$ODOO_VERSION/requirements.txt /build/odoo/requirements.txt
-COPY --chmod=700 build/ /build/
-RUN apt-get -qq update \
-    && xargs -a /build/install/${DISTRIBUTION}/apt-build-deps.txt apt-get install -yqq --no-install-recommends \
+ADD https://raw.githubusercontent.com/$ODOO_SOURCE/$ODOO_VERSION/requirements.txt /build/odoo-requirements.txt
+RUN --mount=type=bind,src=build/install/${DISTRIBUTION}/apt-build-deps.txt,dst=/build/apt-build-deps.txt \
+    --mount=type=bind,src=build/extra-requirements.txt,dst=/build/extra-requirements.txt \
+    --mount=type=bind,src=build/test-requirements.txt,dst=/build/test-requirements.txt \
+    --mount=type=bind,src=build/requirements.txt,dst=/build/requirements.txt \
+    --mount=type=cache,target=/var/cache/apt,sharing=locked \
+    --mount=type=cache,target=/var/lib/apt,sharing=locked \
+    --mount=type=cache,target=/root/.cache/pip \
+    # Install the build dependencies
+    apt-get -qq update \
+    && xargs -a /build/apt-build-deps.txt apt-get install -yqq --no-install-recommends \
     # disable gevent version recommendation from odoo and use 21.12.0 instead
-    && sed -i -E "s/gevent==21\.8\.0/gevent==21.12.0/" /build/odoo/requirements.txt \
+    && sed -i -E "s/gevent==21\.8\.0/gevent==21.12.0/" /build/odoo-requirements.txt \
     # Python Packages
-    && pip install --no-cache-dir --prefer-binary \
-        --requirement /build/odoo/requirements.txt \
+    && pip install --prefer-binary \
+        --requirement /build/odoo-requirements.txt \
         --requirement /build/requirements.txt \
         --requirement /build/extra-requirements.txt \
         --requirement /build/test-requirements.txt \
-        --constraint /build/odoo/requirements.txt \
+        --constraint /build/odoo-requirements.txt \
     && (python3 -m compileall -q /usr/local/lib/python3*/ || true) \
     # Cleanup
-    && xargs -a /build/install/${DISTRIBUTION}/apt-build-deps.txt apt-get purge -yqq \
+    && xargs -a /build/apt-build-deps.txt apt-get purge -yqq \
     && apt-get autopurge -yqq \
-    && rm -rf /var/lib/apt/lists/* /tmp/* \
-    && rm -rf /build \
+    && rm -rf /tmp/* \
+    && rm -rf /build/odoo-requirements.txt \
     && sync
 
 # Install GeoIP database (optional)
