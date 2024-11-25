@@ -35,6 +35,8 @@ ADD https://raw.githubusercontent.com/$ODOO_SOURCE/$ODOO_VERSION/requirements.tx
 COPY --chmod=700 build/ /build/
 RUN apt-get -qq update \
     && xargs -a /build/install/${DISTRIBUTION}/apt-build-deps.txt apt-get install -yqq --no-install-recommends \
+    # disable gevent version recommendation from odoo and use 21.12.0 instead
+    && sed -i -E "s/gevent==21\.8\.0/gevent==21.12.0/" /build/odoo/requirements.txt \
     # Python Packages
     && pip install --no-cache-dir --prefer-binary \
         --requirement /build/odoo/requirements.txt \
