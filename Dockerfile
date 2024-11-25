@@ -36,7 +36,7 @@ COPY --chmod=700 build/ /build/
 RUN apt-get -qq update \
     && xargs -a /build/install/${DISTRIBUTION}/apt-build-deps.txt apt-get install -yqq --no-install-recommends \
     # Python Packages
-    && pip install --no-cache-dir \
+    && pip install --no-cache-dir --prefer-binary \
         --requirement /build/odoo/requirements.txt \
         --requirement /build/requirements.txt \
         --requirement /build/extra-requirements.txt \
