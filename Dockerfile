@@ -69,18 +69,16 @@ COPY ${LOCAL_GEOIP_PATH}/GeoLite2-*.mmdb /usr/share/GeoIP/
 ENV SOURCES=/home/odoo/src
 ENV REPOSITORIES=$SOURCES/repositories
 ENV DATA_DIR=/home/odoo/data
-ENV CONFIG_DIR=/home/odoo/.config
 ENV RESOURCES=/home/odoo/.resources
 
 # Config env
 ENV ODOO_VERSION=$ODOO_VERSION
-ENV ODOO_RC=$CONFIG_DIR/odoo.conf
+ENV ODOO_RC=/home/odoo/.odoorc
 
 # Add odoo user and directories
 RUN useradd -md /home/odoo -s /bin/false odoo \
     && mkdir -p $REPOSITORIES \
     && mkdir -p $DATA_DIR \
-    && mkdir -p $CONFIG_DIR \
     && mkdir -p $RESOURCES \
     && chown -R odoo:odoo /home/odoo \
     && sync

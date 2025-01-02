@@ -96,11 +96,10 @@ same. This is the structure:
         addons/
         filestore/
         sessions/
-    .config/
-        odoo.conf
     .resources/
         conf.d/
         entrypoint.d/
+    .odoorc
 
 | Path                      | Description                                                                                                   |
 | ------------------------- | ------------------------------------------------------------------------------------------------------------- |
@@ -108,13 +107,13 @@ same. This is the structure:
 | `src/repositories`        | Optional. Path where your project's addon repositories are expected to be.                                    |
 | `src/user`                | Optional. Path where your project's local source is expected to be. Submodules will be loaded too.            |
 | `data/`                   | Odoo data directory. You usually want to persist it.                                                          |
-| `.config/odoo.conf`       | Odoo configuration file. Generated automatically from `conf.d`.                                               |
-| `.resources/conf.d`       | Files here will be environment-variable-expanded and concatenated in `odoo.conf` in the entrypoint.           |
+| `.resources/conf.d`       | Files here will be environment-variable-expanded and concatenated in the config file, during the entrypoint.  |
 | `.resources/entrypoint.d` | Any executables found here will be run when you launch your container.                                        |
+| `.odoorc`                 | Odoo configuration file. Generated automatically from `conf.d`.                                               |
 
 ### Runtime environment variables
 
-The following variables can customize entrypoint behaviour and `odoo.conf`:
+The following variables can customize entrypoint behaviour and odoo configuration:
 
 #### Odoo Configuration
 
