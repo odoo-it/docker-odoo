@@ -22,10 +22,13 @@ RUN --mount=type=bind,src=build/install/${DISTRIBUTION},dst=/build/install,rw \
     --mount=type=cache,target=/var/cache/apt,sharing=locked \
     --mount=type=cache,target=/var/lib/apt,sharing=locked \
     apt-get -qq update \
-    && xargs -a /build/install/apt-requirements.txt apt-get install -yqq --no-install-recommends \
+    # Install all apt packages from all the *.packages files, ignoring comments and empty lines
+    && find build/install -name "*.packages" -type f -exec grep -h -v -e '^#' -e '^$' {} + | xargs apt-get install -yqq --no-install-recommends \
+    # Run the install scripts
     && chmod +x /build/install/*.sh \
     && /build/install/wkhtmltopdf-${WKHTMLTOPDF_VERSION}.sh \
     && /build/install/postgres-client.sh \
+    # Cleanup
     && rm -rf /tmp/* \
     && sync
 
