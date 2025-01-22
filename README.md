@@ -145,10 +145,14 @@ The following variables can customize entrypoint behaviour and odoo configuratio
 -   `LIMIT_TIME_REAL`
 -   `LIMIT_TIME_REAL_CRON`
 
+##### Proxy
+
+-   `PROXY_MODE`
+-   `ODOO_X_SENDFILE`
+
 ##### Other
 
 -   `ADMIN_PASSWORD`
--   `PROXY_MODE`
 -   `UNACCENT`
 -   `LOG_LEVEL`
 -   `SERVER_WIDE_MODULES`
