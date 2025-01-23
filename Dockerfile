@@ -1,13 +1,20 @@
-# Common build arguments
+# Base common layer
+# -----------------
+
 ARG PYTHON_VERSION=3.12
 ARG DISTRIBUTION=bookworm
+FROM python:$PYTHON_VERSION-slim-$DISTRIBUTION AS common
+# System environment variables
+ENV PIP_DISABLE_PIP_VERSION_CHECK=1
+# Upgrade pip to latest version
+RUN python -m pip install --upgrade pip
 
 # Python Builder Step
 # -------------------
 # Installs all python dependencies in a virtual environment, which will later be copied
 # to the runtime image.
 
-FROM python:$PYTHON_VERSION-slim-$DISTRIBUTION AS python-deps
+FROM common AS python-deps
 # Update package lists
 RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
     --mount=type=cache,target=/var/lib/apt,sharing=locked \
@@ -18,8 +25,6 @@ RUN --mount=type=bind,src=build/install/${DISTRIBUTION}/apt-build-deps.txt,dst=/
     --mount=type=cache,target=/var/cache/apt,sharing=locked \
     --mount=type=cache,target=/var/lib/apt,sharing=locked \
     xargs -a /build/apt-build-deps.txt apt-get install -yqq --no-install-recommends
-# Upgrade pip to latest version
-RUN python -m pip install --upgrade pip
 # Set up the virtual environment
 ENV VIRTUAL_ENV=/home/odoo/venv
 RUN python -m venv $VIRTUAL_ENV
@@ -49,22 +54,19 @@ RUN --mount=type=bind,src=build/requirements.txt,dst=/build/requirements.txt \
 # -----------------
 # We try to minimize layers as much as possible, to result in a smaller image.
 
-FROM python:$PYTHON_VERSION-slim-$DISTRIBUTION AS odoo
-
-# Multi-arch builds
-ARG TARGETPLATFORM
-ARG BUILDPLATFORM
+FROM common AS odoo
 
 # System environment variables
 ENV LC_ALL=C.UTF-8
 ENV GIT_AUTHOR_NAME=odoo
 ENV GIT_COMMITTER_NAME=odoo
 ENV EMAIL=odoo@localhost
-ENV PIP_DISABLE_PIP_VERSION_CHECK=1
 
 # Very likely, this layer is shared among builds of same distribution
 ARG PYTHON_VERSION
 ARG DISTRIBUTION
+ARG TARGETPLATFORM
+ARG BUILDPLATFORM
 ARG WKHTMLTOPDF_VERSION
 RUN --mount=type=bind,src=build/install/${DISTRIBUTION},dst=/build/install,rw \
     --mount=type=cache,target=/var/cache/apt,sharing=locked \
