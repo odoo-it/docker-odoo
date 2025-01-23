@@ -15,16 +15,12 @@ RUN python -m pip install --upgrade pip
 # to the runtime image.
 
 FROM common AS python-deps
-# Update package lists
-RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
-    --mount=type=cache,target=/var/lib/apt,sharing=locked \
-    apt-get -qq update
 # Install the build dependencies
 ARG DISTRIBUTION
 RUN --mount=type=bind,src=build/install/${DISTRIBUTION}/apt-build-deps.txt,dst=/build/apt-build-deps.txt \
     --mount=type=cache,target=/var/cache/apt,sharing=locked \
     --mount=type=cache,target=/var/lib/apt,sharing=locked \
-    xargs -a /build/apt-build-deps.txt apt-get install -yqq --no-install-recommends
+    apt-get -qq update && xargs -a /build/apt-build-deps.txt apt-get install -yqq --no-install-recommends
 # Set up the virtual environment
 ENV VIRTUAL_ENV=/home/odoo/venv
 RUN python -m venv $VIRTUAL_ENV
