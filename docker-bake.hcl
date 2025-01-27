@@ -20,7 +20,7 @@ group "default" {
 }
 
 group "all" {
-    targets = ["17"]
+    targets = ["master"]
 }
 
 target "_local" {
