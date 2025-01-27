@@ -1,0 +1,7 @@
+# Packages required by Odoo
+# -------------------------
+
+gettext-base
+gnupg2
+locales-all
+npm

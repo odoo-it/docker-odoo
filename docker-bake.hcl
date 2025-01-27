@@ -20,7 +20,7 @@ group "default" {
 }
 
 group "all" {
-    targets = ["12", "13", "14", "15", "16", "17", "18", "master"]
+    targets = ["master"]
 }
 
 target "_local" {
@@ -32,6 +32,7 @@ target "docker-metadata-action" {
 
 target "_common" {
     inherits = ["_local", "docker-metadata-action"]
+    target = "odoo"
     args = {
         LOCAL_GEOIP_PATH = LOCAL_GEOIP_PATH
     }
