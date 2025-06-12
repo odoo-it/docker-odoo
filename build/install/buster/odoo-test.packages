@@ -1,0 +1,8 @@
+# Packages required to run Odoo tests
+# -----------------------------------
+
+# To run the frontend test tours
+chromium
+
+# To be able to record the test tours
+ffmpeg
