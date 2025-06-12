@@ -2,6 +2,10 @@
 # These are usually not properly documented, and are considered optional
 # but they enable some interesting features or improvements.
 
+# This is actually required, to be able to print reports
+pycairo==1.27.0 ; python_version >= '3.12'  # Needed only for reportlab 4.0+
+rlPyCairo==0.3.0 ; python_version >= '3.12' # Needed only for reportlab 4.0+
+
 # https://github.com/odoo/docker/blob/b6411dfc/17.0/Dockerfile#L25C17-L25C22
 python-magic
 
