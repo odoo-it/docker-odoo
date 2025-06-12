@@ -207,9 +207,10 @@ jobs:
           DOCKER_BUILDKIT: 0
           DOCKER_REPO: ${{ env.REGISTRY_IMAGE }}
           DOCKER_TAG: ${{ steps.meta.outputs.version }}
+          ODOO_TEST_ADDONS: base,mail,contacts
         run: |
           docker compose -f tests/compose.yaml build
-          docker compose -f tests/compose.yaml run --rm odoo odoo -i mail,contacts --stop-after-init
+          docker compose -f tests/compose.yaml run --rm odoo odoo -i ${{ env.ODOO_TEST_ADDONS }} --stop-after-init --test-enable
 
   push:
     name: Merge & Push
