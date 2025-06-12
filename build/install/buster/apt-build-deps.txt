@@ -1,4 +1,5 @@
 build-essential
+libcairo2-dev
 libfreetype6-dev
 libfribidi-dev
 libghc-zlib-dev
