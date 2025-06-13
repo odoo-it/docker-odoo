@@ -16,18 +16,18 @@ As an example, assuming you have a local Odoo fork in `./src` and your project a
 #### Dockerfile
 
 ```Docker
-FROM ghcr.io/odoo-it/docker-odoo:15.0.2.0.3 AS base
+FROM ghcr.io/odoo-it/docker-odoo:17.0.4.0.0 AS base
 
 # Install project requirements
-USER root
-COPY --chown=odoo:odoo ./requirements.txt $RESOURCES/requirements.txt
-RUN pip install -r $RESOURCES/requirements.txt
-USER odoo
+RUN --mount=type=bind,src=requirements.txt,dst=$RESOURCES/requirements.txt \
+    --mount=type=cache,target=/home/odoo/.cache/pip \
+    pip install -r $RESOURCES/requirements.txt
 
 # Copy sources
+COPY --chown=odoo:odoo odoo $SOURCES/
 COPY --chown=odoo:odoo repositories $SOURCES/repositories
-COPY --chown=odoo:odoo src $SOURCES/user
-RUN ln -s $SOURCES/repositories/odoo/odoo $SOURCES/odoo && pip-install-odoo
+COPY --chown=odoo:odoo addons $SOURCES/addons
+RUN pip-install-odoo
 ```
 
 #### compose.yaml
@@ -47,8 +47,12 @@ services:
     tty: true
     stdin_open: true
     volumes:
+      - ./odoo/odoo:/home/odoo/src/odoo:rw,z
+      # - ./odoo/enterprise:/home/odoo/src/enterprise:rw,z
+      # - ./odoo/design-themes:/home/odoo/src/design-themes:rw,z
       - ./repositories:/home/odoo/src/repositories:rw,z
-      - ./src:/home/odoo/src/user:rw,z
+      - ./addons:/home/odoo/src/addons:rw,z
+      - ./user:/home/odoo/src/user:rw,z
       - filestore:/home/odoo/data
     environment:
       PGHOST: db
@@ -104,8 +108,11 @@ same. This is the structure:
 | Path                      | Description                                                                                                   |
 | ------------------------- | ------------------------------------------------------------------------------------------------------------- |
 | `src/odoo`                | Empty. Path where odoo source code is expected to be.                                                         |
-| `src/repositories`        | Optional. Path where your project's addon repositories are expected to be.                                    |
-| `src/user`                | Optional. Path where your project's local source is expected to be. Submodules will be loaded too.            |
+| `src/enterprise`          | Optional. Path where odoo enterprise modules are expected to be.                                              |
+| `src/design-themes`       | Optional. Path where odoo design themes are expected to be.                                                   |
+| `src/user`                | Optional. Addons paths will be discovered recursively in this directory.                                      |
+| `src/addons`              | Optional. Addons paths will be discovered recursively in this directory.                                      |
+| `src/repositories`        | Optional. Addons paths will be discovered recursively in this directory.                                      |
 | `data/`                   | Odoo data directory. You usually want to persist it.                                                          |
 | `.resources/conf.d`       | Files here will be environment-variable-expanded and concatenated in the config file, during the entrypoint.  |
 | `.resources/entrypoint.d` | Any executables found here will be run when you launch your container.                                        |
@@ -159,6 +166,7 @@ The following variables can customize entrypoint behaviour and odoo configuratio
 
 #### Entrypoint
 
+-   `ODOO_ADDONS_DISCOVERY_PATHS`: Comma-separated list of paths to discover addons in. Defaults to `~/src/user,~/src/repositories`.
 -   `AUTO_UPDATE_MODULES`: Run `click-odoo-update` to automatically update addons.
 -   `PGTIMEOUT`: Seconds to wait for the postgres server to respond. Set to `0` to disable. (default: `10`)
 
