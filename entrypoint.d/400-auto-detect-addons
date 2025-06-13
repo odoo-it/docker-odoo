@@ -1,57 +1,128 @@
 #!/usr/bin/env python
 
-import os
-import subprocess
 import logging
-_logger = logging.getLogger(__name__)
+import os
+from fnmatch import fnmatch
+from pathlib import Path
+
+# Configure basic logging to console
+logging.basicConfig(level=logging.WARNING, format="%(message)s")
+_logger = logging.getLogger(Path(__file__).stem)
+
+# Equal to odoo.modules.module.MANIFEST_NAMES
+MANIFEST_NAMES = ("__openerp__.py", "__manifest__.py")
+
+# Directories
+SOURCES = Path(os.environ.get("SOURCES"))
+OUTPUT = Path(os.environ.get("RESOURCES")) / "conf.d" / "10-addons.conf"
+
+REQUIRED_ODOO_ADDONS_PATHS = (
+    SOURCES / "odoo" / "addons",
+)
+
+OPTIONAL_ODOO_ADDONS_PATHS = (
+    SOURCES / "design-themes",
+    SOURCES / "enterprise",
+)
+
+DEFAULT_ODOO_ADDONS_DISCOVERY_PATHS = (
+    SOURCES / "user",
+    SOURCES / "addons",
+    SOURCES / "repositories",
+)
+
+ODOO_ADDONS_DISCOVERY_PATHS = (
+    os.environ.get("ODOO_ADDONS_DISCOVERY_PATHS").split(",")
+    if "ODOO_ADDONS_DISCOVERY_PATHS" in os.environ
+    else DEFAULT_ODOO_ADDONS_DISCOVERY_PATHS
+)
 
 
-RESOURCES = os.environ.get('RESOURCES')
-SOURCES = os.environ.get('SOURCES')
-REPOSITORIES = os.path.join(SOURCES, 'repositories')
-USER_REPOSITORY = os.path.join(SOURCES, 'user')
+def is_addon(path) -> bool:
+    """Check if the path is an Odoo addon"""
+    path = Path(path)
+    return path.joinpath("__init__.py").is_file() and any(
+        path.joinpath(manifest).is_file() for manifest in MANIFEST_NAMES
+    )
 
-addons = [
-    os.path.join(SOURCES, 'odoo', 'addons'),
-]
 
-# Handle enterprise
-if os.path.isdir(os.path.join(SOURCES, 'enterprise')):
-    addons.insert(0, os.path.join(SOURCES, 'enterprise'))
+def is_addons_path(path) -> bool:
+    """Check if the path contains Odoo addons"""
+    path = Path(path)
+    if not path.is_dir():
+        return False
+    for subpath in path.iterdir():
+        if not subpath.is_dir():
+            continue
+        if is_addon(subpath):
+            return True
+    return False
 
-# Local repository and its submodules
-# Usually the project repository.
-# Submodules are loaded the same way they are in odoo.sh
-user_addons = []
-if os.path.isdir(USER_REPOSITORY):
-    user_addons = [USER_REPOSITORY]
-    # Append submodules if there are any
-    try:
-        user_addons += [
-            os.path.join(USER_REPOSITORY, line.strip().split(" ")[1])
-            for line in subprocess.check_output(
-                ["git", "submodule", "status"],
-                cwd=USER_REPOSITORY,
-                encoding="UTF-8",
-            ).splitlines()
-        ]
-    except Exception as e:
-        _logger.error("Unable to add submodules: %s", e)
-        pass
 
-# Image repositories, usually dependencies
-repo_addons = []
-if os.path.isdir(REPOSITORIES):
-    repo_addons = [
-        os.path.join(REPOSITORIES, d)
-        for d in sorted(os.listdir(REPOSITORIES))
-        if os.path.isdir(os.path.join(REPOSITORIES, d))
-    ]
+def find_addons_paths(path, recursive=True, exclude=None):
+    """Recursively discover addons paths in the given directory
 
-# Repo addons are preprended, in case we want to overwrite odoo modules
-addons = user_addons + repo_addons + addons
+    :param path: The path to scan for addons
+    :param recursive: Whether to scan recursively
+    :param exclude: A list of fnmatch patterns to exclude from the scan
+    """
+    # Sanitize the path
+    if isinstance(path, str):
+        path = Path(path)
+    # Sanitize the exclude list
+    if isinstance(exclude, str):
+        exclude = (exclude,)
+    elif exclude is None:
+        exclude = ()
+    # If the path is not a directory, yield nothing
+    if not path.is_dir():
+        return
+    # Skip if the path matches any of the exclude patterns
+    if any(fnmatch(path, pattern) for pattern in exclude):
+        return
+    # path can be an addons path itself
+    if is_addons_path(path):
+        yield path
+    # recursively discover addons paths
+    for subpath in path.iterdir():
+        if not subpath.is_dir():
+            continue
+        # skip if the subpath is an addon
+        if is_addon(subpath):
+            continue
+        # recursively discover addons paths
+        if recursive:
+            yield from find_addons_paths(
+                subpath,
+                recursive=recursive,
+                exclude=exclude,
+            )
+
+
+addons = []
+for discovery_path in ODOO_ADDONS_DISCOVERY_PATHS:
+    _logger.info("🔎 Discovering odoo addons paths in %s..", discovery_path)
+    for addons_path in find_addons_paths(discovery_path):
+        addons.append(addons_path)
+        _logger.info("✅ %s", addons_path)
+
+# Then, add odoo enterprise, design-themes and finally odoo addons
+# This lets the discovered addons take precedence over odoo modules
+_logger.info("🔎 Discovering core odoo addons paths..")
+
+for path in OPTIONAL_ODOO_ADDONS_PATHS:
+    if path.is_dir():
+        addons.append(path)
+        _logger.info("✅ %s", path)
+
+for path in REQUIRED_ODOO_ADDONS_PATHS:
+    if path.is_dir():
+        addons.append(path)
+        _logger.info("✅ %s", path)
+    else:
+        _logger.warning("❌ %s: not found", path)
 
 # Overwrite 10-addons.conf
-_logger.debug('Updating addons_path.. %s' % addons)
-with open(os.path.join(RESOURCES, 'conf.d', '10-addons.conf'), 'w+') as file:
-    file.write('[options]\naddons_path = %s' % ','.join(addons))
+output = "[options]\naddons_path = {}\n".format(",".join(map(str, addons)))
+OUTPUT.write_text(output)
+_logger.debug("Updated addons_path: %s", OUTPUT)
