@@ -84,7 +84,7 @@ volumes:
 | `<odoo>` | Targets the latest release for this Odoo version | `17.0`, `16.0`, `master` |
 | `<odoo>.<release>` | Targets a specific release for an Odoo version | `17.0.3.0.0` |
 | `<odoo>-latest` | Targets the latest unreleased/unstable version for this Odoo version | `17.0-latest` |
-| `<odoo>-<sha>` | Targets the a specific commit for this Odoo version | `17.0-a1bsz6` |
+| `<odoo>-<sha>` | Targets a specific commit for this Odoo version | `17.0-a1bsz6` |
 
 ### Directory structure
 
@@ -131,6 +131,9 @@ The following variables can customize entrypoint behaviour and odoo configuratio
 -   `PGDATABASE`
 -   `PGUSER`
 -   `PGPASSWORD`
+-   `DB_TEMPLATE`
+-   `DBFILTER`
+-   `LIST_DB`
 
 ##### SMTP
 
