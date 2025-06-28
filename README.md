@@ -171,7 +171,7 @@ The following variables can customize entrypoint behaviour and odoo configuratio
 
 -   `ODOO_ADDONS_DISCOVERY_PATHS`: Comma-separated list of paths to discover addons in. Defaults to `~/src/user,~/src/repositories`.
 -   `AUTO_UPDATE_MODULES`: Run `click-odoo-update` to automatically update addons.
--   `PGTIMEOUT`: Seconds to wait for the postgres server to respond. Set to `0` to disable. (default: `10`)
+-   `PGTIMEOUT`: Integer number of seconds to wait for the postgres server to respond. Set to `0` to disable. (default: `10`)
 
 ## Development
 

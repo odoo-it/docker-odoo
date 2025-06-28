@@ -16,8 +16,8 @@ echo ""
 echo "You are running Odoo $(tput setaf 3)$ODOO_VERSION$(tput sgr0) connected to $(tput setaf 3)$PGDATABASE$(tput sgr0)."
 echo "The configuration file is $(tput setaf 3)$ODOO_RC$(tput sgr0), generated from $(tput setaf 3)$RESOURCES/conf.d$(tput sgr0)."
 
-# Print some usefull commands
+# Print some useful commands
 echo ""
-echo "Here are some usefull commands:"
+echo "Here are some useful commands:"
 echo "  $(tput setaf 6)odoo$(tput sgr0): Launch Odoo"
 echo "  $(tput setaf 6)psql$(tput sgr0): Connect to the database"
