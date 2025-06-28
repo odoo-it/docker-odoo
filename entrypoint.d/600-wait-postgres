@@ -4,7 +4,13 @@ set -e
 # Default value (set to 0 to disable)
 PGTIMEOUT=${PGTIMEOUT:-10}
 
-if [ ${PGTIMEOUT:-10} -le 0 ]; then
+# Ensure the timeout is numeric
+if ! [[ "$PGTIMEOUT" =~ ^[0-9]+$ ]]; then
+    echo "ERROR: PGTIMEOUT must be an integer" 1>&2
+    exit 1
+fi
+
+if [ "$PGTIMEOUT" -le 0 ]; then
     exit 0
 fi
 
