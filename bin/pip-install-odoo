@@ -23,5 +23,5 @@ if os.path.isdir(ODOO_SOURCE_PATH):
     if "/home/odoo/src/odoo" not in pip_list:
         _logger.info("Installing odoo package..")
         subprocess.check_call([
-            "pip", "install", "--user", "--no-cache-dir", "--no-deps", "--editable", ODOO_SOURCE_PATH
+            "pip", "install", "--no-cache-dir", "--no-deps", "--editable", ODOO_SOURCE_PATH
         ])

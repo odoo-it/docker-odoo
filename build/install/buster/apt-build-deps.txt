@@ -9,6 +9,7 @@ liblcms2-dev
 libldap2-dev
 libopenjp2-7-dev
 libpq-dev
+python3-dev
 libsasl2-dev
 libtiff5-dev
 libwebp-dev
