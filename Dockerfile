@@ -21,9 +21,13 @@ ARG WKHTMLTOPDF_VERSION
 RUN --mount=type=bind,src=build/install/${DISTRIBUTION},dst=/build/install,rw \
     --mount=type=cache,target=/var/cache/apt,sharing=locked \
     --mount=type=cache,target=/var/lib/apt,sharing=locked \
-    apt-get -qq update \
+    # Make all script executable
+    chmod +x /build/install/*.sh \
+    # Execute all the pre-install hooks, if any
+    && find /build/install -name "pre-install-*.sh" -executable -exec {} \; \
+    # Install
+    && apt-get -qq update \
     && xargs -a /build/install/apt-requirements.txt apt-get install -yqq --no-install-recommends \
-    && chmod +x /build/install/*.sh \
     && /build/install/wkhtmltopdf-${WKHTMLTOPDF_VERSION}.sh \
     && /build/install/postgres-client.sh \
     && rm -rf /tmp/* \
