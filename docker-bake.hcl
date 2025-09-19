@@ -20,7 +20,7 @@ group "default" {
 }
 
 group "all" {
-    targets = ["12", "13", "14", "15", "16", "17", "18", "master"]
+    targets = ["12", "13", "14", "15", "16", "17", "18", "19", "master"]
 }
 
 target "_local" {
@@ -114,12 +114,24 @@ target "18" {
     }
 }
 
+
+target "19" {
+    inherits = ["_common"]
+    platforms = ["linux/amd64", "linux/arm64"]
+    args = {
+        ODOO_VERSION="19.0"
+        DISTRIBUTION="trixie"
+        PYTHON_VERSION="3.12"
+        WKHTMLTOPDF_VERSION="0.12.6"
+    }
+}
+
 target "master" {
     inherits = ["_common"]
     platforms = ["linux/amd64", "linux/arm64"]
     args = {
         ODOO_VERSION="master"
-        DISTRIBUTION="bookworm"
+        DISTRIBUTION="trixie"
         PYTHON_VERSION="3.12"
         WKHTMLTOPDF_VERSION="0.12.6"
     }
