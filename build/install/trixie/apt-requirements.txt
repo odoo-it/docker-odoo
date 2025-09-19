@@ -1,0 +1,8 @@
+git
+curl
+chromium
+ffmpeg
+gettext-base
+gnupg2
+locales-all
+npm
