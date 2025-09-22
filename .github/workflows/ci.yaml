@@ -90,7 +90,7 @@ jobs:
 
   build:
     name: Build ${{ matrix.odoo }} (${{ matrix.platform }})
-    runs-on: ubuntu-latest
+    runs-on: ${{ matrix.platform == 'linux/arm64' && 'ubuntu-24.04-arm' || 'ubuntu-24.04' }}
     needs:
       - prepare
       - download-geoip
@@ -110,10 +110,6 @@ jobs:
         name: Prepare Slug
         id: slug
         run: echo "slug=${CACHE_KEY//\//-}" >> "$GITHUB_OUTPUT"
-      -
-        name: Set up QEMU
-        uses: docker/setup-qemu-action@v3
-        if: matrix.platform != 'linux/amd64'
       -
         name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
