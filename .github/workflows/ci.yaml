@@ -11,6 +11,14 @@ on:
   schedule:
     - cron: "0 8 * * 5"
 
+# Cancel in-progress runs when a new commit is pushed to the same ref.
+# github.ref is unique per branch/PR/tag, so pushes to master and PR updates
+# each cancel their own stale runs, while releases (unique tags) never cancel
+# each other.
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
 
 jobs:
 
