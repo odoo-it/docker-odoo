@@ -89,7 +89,7 @@ volumes:
 ### Directory structure
 
 Basically, every directory you have to worry about is found inside `/home/odoo`.
-The directory structure is similar to [odoo.sh](odoo.sh), but not exactly the
+The directory structure is similar to [odoo.sh](https://www.odoo.sh), but not exactly the
 same. This is the structure:
 
     src/
