@@ -1,0 +1,20 @@
+# Everything is excluded by default, then we allow only what the
+# Dockerfile actually needs into the build context.
+*
+
+# Build inputs (see Dockerfile)
+!build/
+!bin/
+!conf.d/
+!entrypoint.d/
+!entrypoint.sh
+!other/
+
+# GeoIP databases (optional, consumed by COPY GeoLite2-*.mmdb)
+!GeoLite2-*.mmdb
+
+# Drop noise that may live inside the allowed directories
+**/.DS_Store
+**/.vscode/
+**/__pycache__/
+**/*.pyc
