@@ -30,8 +30,7 @@ RUN --mount=type=bind,src=build/install/${DISTRIBUTION},dst=/build/install,rw \
     && xargs -a /build/install/apt-requirements.txt apt-get install -yqq --no-install-recommends \
     && /build/install/wkhtmltopdf-${WKHTMLTOPDF_VERSION}.sh \
     && /build/install/postgres-client.sh \
-    && rm -rf /tmp/* \
-    && sync
+    && rm -rf /tmp/*
 
 # Install and build Odoo dependencies
 ARG ODOO_VERSION=master
@@ -61,8 +60,7 @@ RUN --mount=type=bind,src=build/install/${DISTRIBUTION}/apt-build-deps.txt,dst=/
     && xargs -a /build/apt-build-deps.txt apt-get purge -yqq \
     && apt-get autopurge -yqq \
     && rm -rf /tmp/* \
-    && rm -rf /build/odoo-requirements.txt \
-    && sync
+    && rm -rf /build/odoo-requirements.txt
 
 # Install GeoIP database (optional)
 # The LOCAL_GEOIP_PATH is used to specify the path to the GeoIP database files
@@ -84,8 +82,7 @@ RUN useradd -md /home/odoo -s /bin/false odoo \
     && mkdir -p $REPOSITORIES \
     && mkdir -p $DATA_DIR \
     && mkdir -p $RESOURCES \
-    && chown -R odoo:odoo /home/odoo \
-    && sync
+    && chown -R odoo:odoo /home/odoo
 
 # Entrypoint scripts
 COPY --chmod=777 bin/* /usr/local/bin/
