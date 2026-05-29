@@ -187,6 +187,10 @@ jobs:
         env:
           LOCAL_GEOIP_PATH: geoip
         with:
+          # bake-action >= v6 builds from the Git context by default, which
+          # ignores files written locally in earlier steps (the metadata
+          # bake-file). Use the local checkout path context instead.
+          source: .
           files: |
             docker-bake.hcl
             ${{ steps.meta.outputs.bake-file }}
