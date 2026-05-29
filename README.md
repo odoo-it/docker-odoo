@@ -204,3 +204,23 @@ To include the GeoIP databases in the image, you can place the `GeoLite2-City.mm
 
 Alternatively, you can use the `LOCAL_GEOIP_PATH` argument to specify a path to the GeoIP
 databases. However, keep in mind that the path must be relative to the build directory.
+
+### Linting
+
+Dockerfiles are linted with [Hadolint](https://github.com/hadolint/hadolint), managed
+through [pre-commit](https://pre-commit.com/) hooks defined in `.pre-commit-config.yaml`.
+The shared Hadolint configuration lives in `.hadolint.yaml`. CI runs the same hooks, so
+what passes locally passes in CI.
+
+We use [prek](https://github.com/j178/prek), a faster drop-in replacement for the
+`pre-commit` CLI. Install the git hooks once and they'll run on every commit:
+
+```bash
+prek install
+```
+
+You can also run all hooks on demand:
+
+```bash
+prek run --all-files
+```

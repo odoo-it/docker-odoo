@@ -1,0 +1,3 @@
+# Hadolint configuration — shared by pre-commit and CI.
+# https://github.com/hadolint/hadolint#configure
+failure-threshold: warning
