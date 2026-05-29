@@ -172,6 +172,14 @@ The following variables can customize entrypoint behaviour and odoo configuratio
 -   `ODOO_ADDONS_DISCOVERY_PATHS`: Comma-separated list of paths to discover addons in. Defaults to `~/src/user,~/src/repositories`.
 -   `AUTO_UPDATE_MODULES`: Run `click-odoo-update` to automatically update addons.
 -   `PGTIMEOUT`: Integer number of seconds to wait for the postgres server to respond. Set to `0` to disable. (default: `10`)
+-   `ODOO_SKIP_SECRET_WARNINGS`: Set to `true` to silence the warning shown at startup when weak default secrets are still in use (see below).
+
+> [!WARNING]
+> For convenience, this image ships with weak defaults that are **only suitable
+> for local development**: `ADMIN_PASSWORD` defaults to `admin` (the database
+> master password) and `PGPASSWORD` defaults to `odoo`. Always override these
+> before exposing an instance to production. The entrypoint prints a warning at
+> startup while these defaults remain in use.
 
 ## Development
 
