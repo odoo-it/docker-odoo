@@ -3,7 +3,7 @@ variable "REGISTRY" {
 }
 
 variable "VERSION" {
-    default = "18.0"
+    default = "19.0"
 }
 
 variable "LOCAL_GEOIP_PATH" {
@@ -20,7 +20,7 @@ group "default" {
 }
 
 group "all" {
-    targets = ["14", "15", "16", "17", "18", "19", "master"]
+    targets = ["16", "17", "18", "19", "master"]
 }
 
 target "_local" {
@@ -34,28 +34,6 @@ target "_common" {
     inherits = ["_local", "docker-metadata-action"]
     args = {
         LOCAL_GEOIP_PATH = LOCAL_GEOIP_PATH
-    }
-}
-
-target "14" {
-    inherits = ["_common"]
-    platforms = ["linux/amd64"]
-    args = {
-        ODOO_VERSION="14.0"
-        DISTRIBUTION="buster"
-        PYTHON_VERSION="3.10"
-        WKHTMLTOPDF_VERSION="0.12.5"
-    }
-}
-
-target "15" {
-    inherits = ["_common"]
-    platforms = ["linux/amd64"]
-    args = {
-        ODOO_VERSION="15.0"
-        DISTRIBUTION="bullseye"
-        PYTHON_VERSION="3.10"
-        WKHTMLTOPDF_VERSION="0.12.5"
     }
 }
 
