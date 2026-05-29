@@ -1,20 +1,26 @@
-# Everything is excluded by default, then we allow only what the
-# Dockerfile actually needs into the build context.
-*
+# Keep the Docker build context small. We use a denylist (rather than an
+# allowlist) because LOCAL_GEOIP_PATH is configurable, so the GeoIP files
+# may live in any directory and must always reach the build.
 
-# Build inputs (see Dockerfile)
-!build/
-!bin/
-!conf.d/
-!entrypoint.d/
-!entrypoint.sh
-!other/
+# Version control
+.git/
+.gitignore
 
-# GeoIP databases (optional, consumed by COPY GeoLite2-*.mmdb)
-!GeoLite2-*.mmdb
+# CI / repo metadata
+.github/
+.dockerignore
+README.md
+LICENSE
 
-# Drop noise that may live inside the allowed directories
+# Build orchestration (not needed inside the build context)
+docker-bake.hcl
+
+# Tests
+tests/
+
+# Editors / OS / tooling junk
+.vscode/
+.claude/
 **/.DS_Store
-**/.vscode/
 **/__pycache__/
 **/*.pyc
