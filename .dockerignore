@@ -1,0 +1,26 @@
+# Keep the Docker build context small. We use a denylist (rather than an
+# allowlist) because LOCAL_GEOIP_PATH is configurable, so the GeoIP files
+# may live in any directory and must always reach the build.
+
+# Version control
+.git/
+.gitignore
+
+# CI / repo metadata
+.github/
+.dockerignore
+README.md
+LICENSE
+
+# Build orchestration (not needed inside the build context)
+docker-bake.hcl
+
+# Tests
+tests/
+
+# Editors / OS / tooling junk
+.vscode/
+.claude/
+**/.DS_Store
+**/__pycache__/
+**/*.pyc
