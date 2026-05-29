@@ -42,7 +42,7 @@ jobs:
     steps:
       -
         name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
       -
         name: Prepare Build Matrix
         id: matrix
@@ -82,7 +82,7 @@ jobs:
       -
         name: Check cache
         id: geoip-cache
-        uses: actions/cache@v4
+        uses: actions/cache@v5
         with:
           path: 'geoip'
           key: geoip-${{ steps.get-date.outputs.date }}
@@ -125,17 +125,17 @@ jobs:
     steps:
       -
         name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
       -
         name: Prepare Slug
         id: slug
         run: echo "slug=${CACHE_KEY//\//-}" >> "$GITHUB_OUTPUT"
       -
         name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v3
+        uses: docker/setup-buildx-action@v4
       -
         name: Login to Github Container Registry
-        uses: docker/login-action@v3
+        uses: docker/login-action@v4
         with:
           registry: ghcr.io
           username: ${{ github.actor }}
@@ -143,7 +143,7 @@ jobs:
       -
         name: Docker Metadata
         id: meta
-        uses: docker/metadata-action@v5
+        uses: docker/metadata-action@v6
         with:
           images: ${{ env.REGISTRY_IMAGE }}
           flavor: |
@@ -161,7 +161,7 @@ jobs:
             type=raw,value=latest,prefix=${{ matrix.odoo }}-,enable={{is_default_branch}}
       -
         name: Upload Metadata
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         if: matrix.platform == 'linux/amd64'
         with:
           name: bake-meta-${{ matrix.odoo }}
@@ -171,7 +171,7 @@ jobs:
       -
         name: Download GeoIP
         id: geoip
-        uses: actions/cache/restore@v4
+        uses: actions/cache/restore@v5
         with:
           path: 'geoip'
           key: geoip-
@@ -183,7 +183,7 @@ jobs:
       -
         name: Build and Push by Digest
         id: build
-        uses: docker/bake-action@v5
+        uses: docker/bake-action@v7
         env:
           LOCAL_GEOIP_PATH: geoip
         with:
@@ -209,7 +209,7 @@ jobs:
           echo "$digest"
       -
         name: Upload digest
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: digests-${{ steps.slug.outputs.slug }}
           path: /tmp/digests/*
@@ -244,24 +244,24 @@ jobs:
       -
         name: Download Metadata
         id: meta
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v8
         with:
           name: bake-meta-${{ matrix.odoo }}
           path: /tmp
       -
         name: Download digests
         id: digests
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v8
         with:
           path: /tmp/digests
           pattern: digests-${{ matrix.odoo }}*
           merge-multiple: true
       -
         name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v3
+        uses: docker/setup-buildx-action@v4
       -
         name: Login to ghcr.io
-        uses: docker/login-action@v3
+        uses: docker/login-action@v4
         with:
           registry: ghcr.io
           username: ${{ github.actor }}
