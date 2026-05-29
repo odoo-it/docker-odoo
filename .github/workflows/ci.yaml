@@ -11,11 +11,12 @@ on:
   schedule:
     - cron: "0 8 * * 5"
 
-# Cancel in-progress runs for the same PR/branch when a new commit is pushed.
-# For pushes to master and releases, github.head_ref is empty, so the group
-# falls back to the unique run_id and those runs are never cancelled.
+# Cancel in-progress runs when a new commit is pushed to the same ref.
+# github.ref is unique per branch/PR/tag, so pushes to master and PR updates
+# each cancel their own stale runs, while releases (unique tags) never cancel
+# each other.
 concurrency:
-  group: ${{ github.workflow }}-${{ github.head_ref || github.run_id }}
+  group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
 
 
