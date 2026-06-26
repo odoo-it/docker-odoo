@@ -82,7 +82,7 @@ jobs:
       -
         name: Check cache
         id: geoip-cache
-        uses: actions/cache@v5
+        uses: actions/cache@v6
         with:
           path: 'geoip'
           key: geoip-${{ steps.get-date.outputs.date }}
@@ -171,7 +171,7 @@ jobs:
       -
         name: Download GeoIP
         id: geoip
-        uses: actions/cache/restore@v5
+        uses: actions/cache/restore@v6
         with:
           path: 'geoip'
           key: geoip-
