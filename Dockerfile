@@ -96,6 +96,8 @@ COPY --chown=odoo:odoo --chmod=777 other/welcome.sh /etc/profile.d/
 # Default values for postgres
 ENV PGHOST=db
 ENV PGUSER=odoo
+# Not a secret: default credentials for a local development database
+# hadolint ignore=DL3064
 ENV PGPASSWORD=odoo
 
 # Docker
