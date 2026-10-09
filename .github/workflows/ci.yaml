@@ -114,6 +114,11 @@ jobs:
     needs:
       - prepare
       - download-geoip
+    # Explicit permissions are required for Dependabot-triggered runs, which
+    # otherwise get a read-only GITHUB_TOKEN and can't push to GHCR.
+    permissions:
+      contents: read
+      packages: write
     strategy:
       fail-fast: false
       matrix:
