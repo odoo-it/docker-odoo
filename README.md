@@ -59,7 +59,7 @@ services:
       PGDATABASE: odoodb
 
   db:
-    image: postgres:15
+    image: postgres:16
     environment:
       POSTGRES_USER: odoo
       POSTGRES_PASSWORD: odoo
