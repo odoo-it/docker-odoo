@@ -20,7 +20,7 @@ group "default" {
 }
 
 group "all" {
-    targets = ["16", "17", "18", "19", "master"]
+    targets = ["16", "17", "18", "19", "20", "master"]
 }
 
 target "_local" {
@@ -76,6 +76,17 @@ target "19" {
     platforms = ["linux/amd64", "linux/arm64"]
     args = {
         ODOO_VERSION="19.0"
+        DISTRIBUTION="trixie"
+        PYTHON_VERSION="3.12"
+        WKHTMLTOPDF_VERSION="0.12.6"
+    }
+}
+
+target "20" {
+    inherits = ["_common"]
+    platforms = ["linux/amd64", "linux/arm64"]
+    args = {
+        ODOO_VERSION="20.0"
         DISTRIBUTION="trixie"
         PYTHON_VERSION="3.12"
         WKHTMLTOPDF_VERSION="0.12.6"
